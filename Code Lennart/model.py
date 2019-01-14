@@ -1,4 +1,5 @@
 from mesa import Model
+from mesa.time import SimultaneousActivation
 import matplotlib.pyplot as plt
 
 import road
@@ -12,6 +13,8 @@ class RoadSim(Model):
 
         self.road = road.RoadContinuous()
 
+        self.schedule = SimultaneousActivation(self)
+
         # car1 = car.Car()
         self.cars = []
         self.new_car()
@@ -22,9 +25,18 @@ class RoadSim(Model):
 
         self.road.env.place_agent(new_car, (new_car.x, new_car.y))
         self.cars.append(new_car)
+        getattr(self, f'schedule').add(new_car)
+
+    def step(self):
+        self.schedule.step()
+        self.visualise()
+
+    def run_sim(self, steps=200):
+        for _ in range(steps):
+            self.step()
     
     def visualise(self):
-        self.fig = plt.figure(figsize=(2500, 5 * 10), dpi=80)
+        self.fig = plt.figure(figsize=(50, 5), dpi=80)
         self.plot = self.fig.gca()
         self.road.visualise(self.plot)
 
@@ -37,4 +49,6 @@ class RoadSim(Model):
 
 mod1 = RoadSim()
 
-mod1.visualise()
+# mod1.visualise()
+
+mod1.run_sim()
