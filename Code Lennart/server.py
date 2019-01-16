@@ -28,11 +28,11 @@ def agent_portrayal(agent):
                 "heading_y": 0,
                 "text": agent.x,
                 "text_color": "white",
-                "scale": 2.0,}
+                "scale": 10.0,}
     return portrayal
 
 number_of_lanes=3
-length=500
+length=1000
 
 
 

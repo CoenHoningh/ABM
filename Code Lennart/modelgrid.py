@@ -28,16 +28,12 @@ class RoadSim(Model):
         self.new_car(start_lane=1, speed=2)
 
     def init_cars(self):
-        r = random.random()
-        if r < self.spawn_chance:
-            speed = random.randint(2,3)
-            print(self.lanes)
-            for start_lane in range(self.lanes):
-                free_space = [self.grid.is_cell_empty((x, start_lane)) for x in range(0,speed)]
-                if all(free_space):
-                    self.new_car(speed=speed, start_lane=start_lane)
-                    break
-
+        speed = random.randint(2,3)
+        print(self.lanes)
+        for start_lane in range(self.lanes):
+            free_space = [self.grid.is_cell_empty((x, start_lane)) for x in range(0,speed)]
+            if all(free_space) and random.random()<self.spawn_chance:
+                self.new_car(speed=speed, start_lane=start_lane)
 
     def new_car(self, start_lane=0, speed=1):
         new_car = car.Car(self.next_id(), self,
