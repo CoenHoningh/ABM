@@ -9,18 +9,42 @@ class Car(Agent):
         self.unique_id = unique_id
         self.size = size
         self.start_lane = start_lane
+        self.lane = start_lane
         self.x = 0
         self.y = start_lane
         self.pos = (self.x, self.y)
         self.speed = speed
+        self.max_speed = speed
         self.new_x = 0
+        self.new_y = start_lane
         self.colormap = plt.get_cmap('Dark2')
         r = random.random()
         self.color = self.colormap(r)
 
+    def _is_free(self, _view, _lane):
+        bool_list = [self.model.grid.is_cell_empty((self.x+x, self.y+_lane)) for x in range(1, _view)]
+        return all(bool_list)
+
     def step(self):
         self.pos = (self.x, self.y)
-        self.new_x = self.x + self.speed
+        if self._is_free(8, 0):
+            self.speed = min(self.max_speed, self.speed+1)
+            self.new_x = self.x + self.speed
+            if self.y > 0:
+                if self._is_free(10, -1):
+                    self.new_y = self.y - 1
+
+        elif self.lane < (self.model.lanes-1):
+            if self._is_free(6, 1):
+                self.speed = min(self.max_speed, self.speed+1)
+                self.new_x = self.x + self.speed
+                self.new_y = self.y + 1
+
+        else:
+            self.speed = max(self.speed-1, 0)
+            self.new_x = self.x + self.speed
+            self.new_y = self.y
+
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
             print("hoi")
             return
@@ -34,13 +58,15 @@ class Car(Agent):
         # print("-----------------------------")
 
     def advance(self):
-        if self.model.grid.out_of_bounds((self.new_x, self.y)):
+        if self.model.grid.out_of_bounds((self.new_x, self.new_y)):
             print("hoi")
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
             print(self.pos)
             return
         self.x = self.new_x
+        self.y = self.new_y
+        print('yo')
         self.model.grid.move_agent(self, (self.x, self.y))
 
     def visualize(self, plot):
