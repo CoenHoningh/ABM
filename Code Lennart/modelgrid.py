@@ -30,7 +30,7 @@ class RoadSim(Model):
         if r < self.spawn_chance:
             speed = random.randint(1,3)
             start_lane = random.randint(0, self.lanes)
-            free_space = [self.grid.env.is_cell_empty((start_lane, x)) for x in range(10)]
+            free_space = [self.grid.is_cell_empty((start_lane, x)) for x in range(10)]
             if all(free_space):
                 self.new_car(speed=speed, start_lane=start_lane)
 
@@ -39,7 +39,7 @@ class RoadSim(Model):
         new_car = car.Car(self.next_id(), self,
                             start_lane=start_lane, speed=speed)
 
-        self.grid.env.place_agent(new_car, (new_car.x, new_car.y))
+        self.grid.place_agent(new_car, (new_car.x, new_car.y))
         self.cars.append(new_car)
         getattr(self, f'schedule').add(new_car)
 

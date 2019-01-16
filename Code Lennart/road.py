@@ -24,11 +24,12 @@ class RoadContinuous():
 
 
 # For a road where the lanes are also a grid.
-class RoadGrid():
+class RoadGrid(SingleGrid):
     def __init__(self, length=500, lanes=1):
-        self.width = length
-        self.height = lanes
-        self.env = SingleGrid(self.width, self.height, True)
+        super().__init__(length, lanes, True)
+        #self.width = length
+        #self.height = lanes
+        #self.env = SingleGrid(self.width, self.height, True)
 
 # road2 = RoadGrid(lanes=3)
 
