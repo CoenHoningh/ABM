@@ -34,7 +34,7 @@ class Car(Agent):
                 if self._is_free(10, -1):
                     self.new_y = self.y - 1
 
-        elif self.lane < (self.model.lanes-1):
+        elif self.y < (self.model.lanes-1):
             if self._is_free(6, 1):
                 self.speed = min(self.max_speed, self.speed+1)
                 self.new_x = self.x + self.speed
