@@ -32,7 +32,9 @@ class RoadSim(Model):
             speed = random.randint(1,3)
             print(self.lanes)
             start_lane = random.randint(0, self.lanes - 1)
-            self.new_car(speed=speed, start_lane=start_lane)
+            free_space = [self.grid.is_cell_empty((x, start_lane)) for x in range(10)]
+            if all(free_space):
+                self.new_car(speed=speed, start_lane=start_lane)
 
 
     def new_car(self, start_lane=0, speed=1):
