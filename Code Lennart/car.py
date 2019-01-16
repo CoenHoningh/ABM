@@ -14,16 +14,18 @@ class Car(Agent):
         self.pos = (self.x, self.y)
         self.speed = speed
         self.new_x = 0
-        colormap = plt.get_cmap('Dark2')
+        self.colormap = plt.get_cmap('Dark2')
         r = random.random()
-        self.color = colormap(r)
+        self.color = self.colormap(r)
 
     def step(self):
+        self.pos = (self.x, self.y)
         self.new_x = self.x + self.speed
         if self.model.road.env.out_of_bounds((self.new_x, self.y)):
             print("hoi")
             return
-        close = self.model.road.env.get_neighbors(self.pos, 2, False)
+        close = self.model.road.env.get_neighbors(self.pos, 3, False)
+        self.color = self.colormap(len(close))
         for car in close:
             if car.y == self.y and car.x >= self.x:
                 pass
