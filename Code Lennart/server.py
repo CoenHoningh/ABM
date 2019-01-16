@@ -19,14 +19,14 @@ from modelgrid import *
 def agent_portrayal(agent):
     portrayal = {"Shape": "arrowHead",
                 "Filled": "true",
-                "Layer": 2,
+                "Layer": 0,
                 "Color": "green",
                 "Filled": "true",
                 "heading_x": 1,
                 "heading_y": 0,
-                "text": "hoi",
+                "text": agent.x,
                 "text_color": "white",
-                "scale": 1.0,}
+                "scale": 2.0,}
     return portrayal
 
 number_of_lanes=5
