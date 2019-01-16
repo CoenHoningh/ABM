@@ -20,13 +20,15 @@ def agent_portrayal(agent):
     portrayal = {"Shape": "arrowHead",
                 "Filled": "true",
                 "Layer": 2,
-                "Color": "green",
+                "Color": "black",
                 "Filled": "true",
                 "heading_x": 1,
                 "heading_y": 0,
-                "text": "hoi",
+                # "text": "hoi",
                 "text_color": "white",
                 "scale": 0.8,}
+    # print(agent.color)
+    # portrayal["Color"] = agent.color
     return portrayal
 
 number_of_lanes=3
@@ -48,7 +50,7 @@ grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 50)
 # Create the server, and pass the grid and the graph
 server = ModularServer(RoadSim,
                        [grid],
-                       "WolfSheep Model",
+                       "Traffic model",
                        {"lanes":number_of_lanes, "length":length})
 
 server.port = 8522
