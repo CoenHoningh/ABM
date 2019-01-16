@@ -1,4 +1,5 @@
 from mesa.visualization.modules import CanvasGrid
+from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 
@@ -16,11 +17,13 @@ from modelgrid import *
 
 # You can change this to whatever ou want. Make sure to make the different types
 # of agents distinguishable
+colors = ['red', 'orange', 'yellow', 'green', 'pink']
 def agent_portrayal(agent):
     portrayal = {"Shape": "arrowHead",
                 "Filled": "true",
                 "Layer": 0,
-                "Color": "green",
+                "Color": colors[agent.speed],
+                "Filled": "true",
                 "heading_x": 1,
                 "heading_y": 0,
                 "text": agent.x,
@@ -28,7 +31,7 @@ def agent_portrayal(agent):
                 "scale": 2.0,}
     return portrayal
 
-number_of_lanes=5
+number_of_lanes=3
 length=500
 
 
@@ -47,8 +50,9 @@ grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 60)
 # Create the server, and pass the grid and the graph
 server = ModularServer(RoadSim,
                        [grid],
-                       "Traffic model",
-                       {"lanes":number_of_lanes, "length":length})
+                       "Road sim yo",
+                       {"lanes":number_of_lanes, "length":length, "spawn_chance":
+                        UserSettableParameter('slider', "Spawn Chance", 0.3, 0.001, 1.0, 0.01)})
 
 server.port = 8522
 
