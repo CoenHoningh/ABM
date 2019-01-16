@@ -4,10 +4,8 @@ import random
 import matplotlib.pyplot as plt
 
 class Car(Agent):
-    def __init__(self, unique_id, model, size=1, start_lane=0, speed=100):
+    def __init__(self, unique_id, model, start_lane=0, speed=1):
         super().__init__(unique_id, model)
-        self.unique_id = unique_id
-        self.size = size
         self.start_lane = start_lane
         self.x = 0
         self.y = start_lane
@@ -42,6 +40,3 @@ class Car(Agent):
             return
         self.x = self.new_x
         self.model.grid.move_agent(self, (self.x, self.y))
-
-    def visualize(self, plot):
-        plot.scatter(self.x, self.y, s=100, marker='s')

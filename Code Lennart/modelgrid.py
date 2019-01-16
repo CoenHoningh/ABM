@@ -13,9 +13,10 @@ class RoadSim(Model):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
-        self.spawn_chance = 0.03
+        self.length = length
+        self.spawn_chance = 0.1
 
-        self.grid = road.RoadGrid(lanes=self.lanes)
+        self.grid = road.RoadGrid(length=self.length, lanes=self.lanes)
         #self.grid = SingleGrid(length, self.lanes, True)
 
         self.schedule = SimultaneousActivation(self)
@@ -32,6 +33,7 @@ class RoadSim(Model):
             start_lane = random.randint(0, self.lanes)
             free_space = [self.grid.is_cell_empty((start_lane, x)) for x in range(10)]
             if all(free_space):
+                print('yo')
                 self.new_car(speed=speed, start_lane=start_lane)
 
 

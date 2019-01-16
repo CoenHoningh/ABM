@@ -14,6 +14,8 @@ from modelgrid import *
 #IPython.get_ipython().magic("run Mesa_introduction.ipynb")
 #sys.stdout = orig_stdout
 
+lanes = 3
+length = 500
 # You can change this to whatever ou want. Make sure to make the different types
 # of agents distinguishable
 def agent_portrayal(agent):
@@ -25,7 +27,7 @@ def agent_portrayal(agent):
     return portrayal
 
 # Create a grid of 20 by 20 cells, and display it as 500 by 500 pixels
-grid = CanvasGrid(agent_portrayal, 50, 2, 500, 500)
+grid = CanvasGrid(agent_portrayal, length, lanes, 500, 500)
 
 # Create a dynamic linegraph
 # chart = ChartModule([{"Label": "Sheep",
@@ -37,8 +39,8 @@ grid = CanvasGrid(agent_portrayal, 50, 2, 500, 500)
 # Create the server, and pass the grid and the graph
 server = ModularServer(RoadSim,
                        [grid],
-                       "WolfSheep Model",
-                       {})
+                       "Verkeers simulatie yoo",
+                       {"lanes": lanes, "length": length})
 
 server.port = 8521
 
