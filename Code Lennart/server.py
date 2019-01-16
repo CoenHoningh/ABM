@@ -19,25 +19,22 @@ from modelgrid import *
 def agent_portrayal(agent):
     portrayal = {"Shape": "arrowHead",
                 "Filled": "true",
-                "Layer": 2,
-                "Color": "black",
-                "Filled": "true",
+                "Layer": 0,
+                "Color": "green",
                 "heading_x": 1,
                 "heading_y": 0,
-                # "text": "hoi",
+                "text": agent.x,
                 "text_color": "white",
-                "scale": 0.8,}
-    # print(agent.color)
-    # portrayal["Color"] = agent.color
+                "scale": 2.0,}
     return portrayal
 
-number_of_lanes=3
+number_of_lanes=5
 length=500
 
 
 
 # Create a grid of 20 by 20 cells, and display it as 500 by 500 pixels
-grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 50)
+grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 60)
 
 # Create a dynamic linegraph
 # chart = ChartModule([{"Label": "Sheep",
