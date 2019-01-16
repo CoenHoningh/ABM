@@ -10,10 +10,10 @@ class RoadContinuous():
         self.length = length
         self.lanes = lanes
 
-        self.env = ContinuousSpace(self.length, self.lanes * 10, True)
+        self.env = ContinuousSpace(self.length, self.lanes * 10, torus=False)
 
     def visualise(self, plot):
-        plot.hlines(range(self.lanes + 1), 0, self.length*5)
+        plot.hlines(range(self.lanes + 1), 0, self.length)
 
 
 # road1 = RoadContinuous(lanes=5)
@@ -32,7 +32,7 @@ class RoadGrid():
         self.env = SingleGrid(self.length, self.lanes, True)
 
     def visualise(self, plot):
-        plot.hlines(range(self.lanes + 1), 0, self.length*5)
+        plot.hlines(range(self.lanes + 1), 0, self.length)
 
 
 # road2 = RoadGrid(lanes=3)

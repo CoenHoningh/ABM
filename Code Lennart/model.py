@@ -20,7 +20,7 @@ class RoadSim(Model):
         # car1 = car.Car()
         self.cars = []
         self.new_car()
-        self.new_car(start_lane=1, speed=1.5)
+        self.new_car(start_lane=0, speed=1.5)
 
     def init_cars(self):
         r = random.random()
@@ -31,7 +31,8 @@ class RoadSim(Model):
 
 
     def new_car(self, start_lane=0, speed=1):
-        new_car = car.Car(self.next_id(), start_lane=start_lane, speed=speed)
+        new_car = car.Car(self.next_id(), self,
+                            start_lane=start_lane, speed=speed)
 
         self.road.env.place_agent(new_car, (new_car.x, new_car.y))
         self.cars.append(new_car)
@@ -39,7 +40,8 @@ class RoadSim(Model):
 
     def step(self):
         self.schedule.step()
-        self.carplot.set_offsets([(car.x, car.y) for car in self.cars])
+        self.carplot.set_offsets([(car[0], car[1])
+                                        for car in self.road.env._agent_points])
         self.carplot.set_color([car.color for car in self.cars])
         # self.visualise()
 
@@ -58,14 +60,14 @@ class RoadSim(Model):
         self.road.visualise(self.plot)
 
         # print(list(list(zip(*self.cars))[0]))
-        self.carplot = self.plot.scatter([car.x for car in self.cars],
-                                [car.y for car in self.cars], s=100, marker='s')
+        self.carplot = self.plot.scatter([car[0] for car in self.road.env._agent_points],
+                                [car[1] for car in self.road.env._agent_points], s=100, marker='s')
 
 
 
 
 
-mod1 = RoadSim(lanes=5)
+mod1 = RoadSim(lanes=2)
 
 # mod1.visualise()
 
