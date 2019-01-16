@@ -6,7 +6,7 @@ from mesa.visualization.modules import ChartModule
 import IPython
 import os
 import sys
-from modelgrid import *
+from modelgrid import RoadSim
 
 # Change stdout so we can ignore most prints etc.
 #orig_stdout = sys.stdout
@@ -23,11 +23,11 @@ def agent_portrayal(agent):
                  "Color": "blue",
                  "Filled": "true",
                  "Layer": 0,
-                 "r": 0.5}
+                 "r": 1.0}
     return portrayal
 
 # Create a grid of 20 by 20 cells, and display it as 500 by 500 pixels
-grid = CanvasGrid(agent_portrayal, length, lanes, 500, 500)
+grid = CanvasGrid(agent_portrayal, length, lanes, 1000, 10)
 
 # Create a dynamic linegraph
 # chart = ChartModule([{"Label": "Sheep",

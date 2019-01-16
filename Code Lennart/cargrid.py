@@ -17,7 +17,9 @@ class Car(Agent):
         self.color = self.colormap(r)
 
     def step(self):
+        print('yoyo')
         self.pos = (self.x, self.y)
+        print(self.pos)
         self.new_x = self.x + self.speed
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
             print("hoi")
@@ -30,6 +32,7 @@ class Car(Agent):
                 # print(f"self.x = {self.x} \t\t other.x = {car.x}")
                 # print(f"self.y = {self.y} \t\t other.y = {car.y}")
         # print("-----------------------------")
+        self.advance()
 
     def advance(self):
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
