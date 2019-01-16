@@ -11,7 +11,6 @@ import cargrid as car
 class RoadSim(Model):
     def __init__(self, lanes=2, length=500):
         super().__init__()
-        print(lanes)
         self.current_id=0
         self.lanes = lanes
         self.spawn_chance = 0.3
@@ -30,7 +29,6 @@ class RoadSim(Model):
         r = random.random()
         if r < self.spawn_chance:
             speed = random.randint(1,3)
-            print(self.lanes)
             start_lane = random.randint(0, self.lanes - 1)
             self.new_car(speed=speed, start_lane=start_lane)
 
@@ -39,7 +37,6 @@ class RoadSim(Model):
         new_car = car.Car(self.next_id(), self,
                             start_lane=start_lane, speed=speed)
 
-        print(new_car.y)
         self.grid.place_agent(new_car, (new_car.x, new_car.y))
         self.cars.append(new_car)
         getattr(self, f'schedule').add(new_car)
