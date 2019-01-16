@@ -9,11 +9,12 @@ import cargrid as car
 
 
 class RoadSim(Model):
-    def __init__(self, lanes=1, length=500):
+    def __init__(self, lanes=2, length=500):
         super().__init__()
+        print(lanes)
         self.current_id=0
         self.lanes = lanes
-        self.spawn_chance = 0.03
+        self.spawn_chance = 0.3
 
         # self.grid = road.RoadGrid(lanes=self.lanes)
         self.grid = SingleGrid(length, self.lanes, True)
@@ -23,13 +24,14 @@ class RoadSim(Model):
         # car1 = car.Car()
         self.cars = []
         self.new_car()
-        # self.new_car(start_lane=1, speed=2)
+        self.new_car(start_lane=1, speed=2)
 
     def init_cars(self):
         r = random.random()
         if r < self.spawn_chance:
             speed = random.randint(1,3)
-            start_lane = random.randint(0, self.lanes)
+            print(self.lanes)
+            start_lane = random.randint(0, self.lanes - 1)
             self.new_car(speed=speed, start_lane=start_lane)
 
 
@@ -37,24 +39,27 @@ class RoadSim(Model):
         new_car = car.Car(self.next_id(), self,
                             start_lane=start_lane, speed=speed)
 
+        print(new_car.y)
         self.grid.place_agent(new_car, (new_car.x, new_car.y))
         self.cars.append(new_car)
         getattr(self, f'schedule').add(new_car)
 
     def step(self):
         self.schedule.step()
+        self.init_cars()
         # self.carplot.set_offsets([(car[0], car[1])
         #                                 for car in self.road.env._agent_points])
         # self.carplot.set_color([car.color for car in self.cars])
         # self.visualise()
 
-    def run_sim(self, steps=500):
-        # self.visualise()
-        for _ in range(steps):
-            # plt.draw()
-            self.step()
-            # self.init_cars()
-            # plt.pause(0.001)
+    # def run_sim(self, steps=500):
+    #     # self.visualise()
+    #     for _ in range(steps):
+    #         # plt.draw()
+    #         self.step()
+    #         print("hoi")
+    #         self.init_cars()
+    #         # plt.pause(0.001)
     
     def visualise(self):
         plt.ion()

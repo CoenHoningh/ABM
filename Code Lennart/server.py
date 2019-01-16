@@ -17,15 +17,25 @@ sys.stdout = orig_stdout
 # You can change this to whatever ou want. Make sure to make the different types
 # of agents distinguishable
 def agent_portrayal(agent):
-    portrayal = {"Shape": "circle",
-                 "Color": "blue",
-                 "Filled": "true",
-                 "Layer": 0,
-                 "r": 0.5}
+    portrayal = {"Shape": "arrowHead",
+                "Filled": "true",
+                "Layer": 2,
+                "Color": "green",
+                "Filled": "true",
+                "heading_x": 1,
+                "heading_y": 0,
+                "text": "hoi",
+                "text_color": "white",
+                "scale": 0.8,}
     return portrayal
 
+number_of_lanes=3
+length=500
+
+
+
 # Create a grid of 20 by 20 cells, and display it as 500 by 500 pixels
-grid = CanvasGrid(agent_portrayal, 50, 2, 500, 500)
+grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 50)
 
 # Create a dynamic linegraph
 # chart = ChartModule([{"Label": "Sheep",
@@ -34,12 +44,13 @@ grid = CanvasGrid(agent_portrayal, 50, 2, 500, 500)
 #                       "Color": "red"}],
 #                     data_collector_name='datacollector')
 
+
 # Create the server, and pass the grid and the graph
 server = ModularServer(RoadSim,
                        [grid],
                        "WolfSheep Model",
-                       {})
+                       {"lanes":number_of_lanes, "length":length})
 
-server.port = 8521
+server.port = 8522
 
 server.launch()
