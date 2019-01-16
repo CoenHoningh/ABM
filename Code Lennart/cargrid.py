@@ -48,6 +48,7 @@ class Car(Agent):
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
             print("hoi")
             return
+        
         close = self.model.grid.get_neighbors(self.pos, 3, False)
         self.color = self.colormap(len(close))
         for car in close:
@@ -56,6 +57,10 @@ class Car(Agent):
                 # print(f"self.x = {self.x} \t\t other.x = {car.x}")
                 # print(f"self.y = {self.y} \t\t other.y = {car.y}")
         # print("-----------------------------")
+        self.x = self.new_x
+        self.y = self.new_y
+        print('yo')
+        self.model.grid.move_agent(self, (self.x, self.y))
 
     def advance(self):
         if self.model.grid.out_of_bounds((self.new_x, self.new_y)):
@@ -64,10 +69,6 @@ class Car(Agent):
             self.model.schedule.remove(self)
             print(self.pos)
             return
-        self.x = self.new_x
-        self.y = self.new_y
-        print('yo')
-        self.model.grid.move_agent(self, (self.x, self.y))
 
     def visualize(self, plot):
         plot.scatter(self.x, self.y, s=100, marker='s')
