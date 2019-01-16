@@ -28,12 +28,7 @@ class RoadGrid():
     def __init__(self, length=500, lanes=1):
         self.width = length
         self.height = lanes
-
         self.env = SingleGrid(self.width, self.height, True)
-
-    def visualise(self, plot):
-        plot.hlines(range(self.lanes + 1), 0, self.length)
-
 
 # road2 = RoadGrid(lanes=3)
 
