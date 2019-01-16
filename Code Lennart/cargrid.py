@@ -45,7 +45,7 @@ class Car(Agent):
             print(self.speed)
             print(self.unique_id)
             print('...')
-        if self._is_free(self.speed*2, 0):
+        if self._is_free(self.speed*2+1, 0):
             '''
             Move ahead if the current speed allows
             '''
@@ -58,7 +58,7 @@ class Car(Agent):
                     '''
                     self.new_y = self.y - 1
 
-        elif self.y < (self.model.lanes-1) and self._is_free(self.speed*2, 1):
+        elif self.y < (self.model.lanes-1) and self._is_free(self.speed*2+1, 1):
             '''
             Move a lane to the left if the speed allows
             '''
@@ -70,6 +70,7 @@ class Car(Agent):
             '''
             Slow down 1 tick if none are possible
             '''
+            self.speed = max(self.speed-1, 0)
             while not self._is_free(self.speed+1, 0):
                 self.speed = max(self.speed-1, 0)
             self.new_x = self.x + self.speed

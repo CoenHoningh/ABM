@@ -9,12 +9,12 @@ import cargrid as car
 
 
 class RoadSim(Model):
-    def __init__(self, lanes=2, length=500):
+    def __init__(self, lanes=2, length=500, spawn_chance=0.3):
         super().__init__()
         print(lanes)
         self.current_id=0
         self.lanes = lanes
-        self.spawn_chance = 0.5
+        self.spawn_chance = spawn_chance
         self.length = length
 
         # self.grid = road.RoadGrid(lanes=self.lanes)
@@ -30,12 +30,13 @@ class RoadSim(Model):
     def init_cars(self):
         r = random.random()
         if r < self.spawn_chance:
-            speed = random.randint(2,5)
+            speed = random.randint(2,3)
             print(self.lanes)
-            start_lane = random.randint(0, self.lanes - 1)
-            free_space = [self.grid.is_cell_empty((x, start_lane)) for x in range(10)]
-            if all(free_space):
-                self.new_car(speed=speed, start_lane=start_lane)
+            for start_lane in range(self.lanes):
+                free_space = [self.grid.is_cell_empty((x, start_lane)) for x in range(0,speed)]
+                if all(free_space):
+                    self.new_car(speed=speed, start_lane=start_lane)
+                    break
 
 
     def new_car(self, start_lane=0, speed=1):
