@@ -26,10 +26,10 @@ class RoadContinuous():
 # For a road where the lanes are also a grid.
 class RoadGrid():
     def __init__(self, length=500, lanes=1):
-        self.length = length
-        self.lanes = lanes
+        self.width = length
+        self.height = lanes
 
-        self.env = SingleGrid(self.length, self.lanes, True)
+        self.env = SingleGrid(self.width, self.height, True)
 
     def visualise(self, plot):
         plot.hlines(range(self.lanes + 1), 0, self.length)
