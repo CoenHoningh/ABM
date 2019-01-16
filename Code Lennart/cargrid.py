@@ -63,12 +63,13 @@ class Car(Agent):
         self.model.grid.move_agent(self, (self.x, self.y))
 
     def advance(self):
-        if self.model.grid.out_of_bounds((self.new_x, self.new_y)):
+        if self.model.grid.out_of_bounds((self.new_x+10, self.new_y)):
             print("hoi")
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
             print(self.pos)
             return
+
 
     def visualize(self, plot):
         plot.scatter(self.x, self.y, s=100, marker='s')
