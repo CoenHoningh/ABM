@@ -6,6 +6,7 @@ from mesa.visualization.modules import ChartModule
 import IPython
 import os
 import sys
+from modelgrid import *
 
 # Change stdout so we can ignore most prints etc.
 orig_stdout = sys.stdout
@@ -17,25 +18,25 @@ sys.stdout = orig_stdout
 # of agents distinguishable
 def agent_portrayal(agent):
     portrayal = {"Shape": "circle",
-                 "Color": "blue" if type(agent) is Wolf else "green",
+                 "Color": "blue",
                  "Filled": "true",
                  "Layer": 0,
                  "r": 0.5}
     return portrayal
 
 # Create a grid of 20 by 20 cells, and display it as 500 by 500 pixels
-grid = CanvasGrid(agent_portrayal, 20, 20, 500, 500)
+grid = CanvasGrid(agent_portrayal, 50, 2, 500, 500)
 
 # Create a dynamic linegraph
-chart = ChartModule([{"Label": "Sheep",
-                      "Color": "green"},
-                      {"Label": "Wolves",
-                      "Color": "red"}],
-                    data_collector_name='datacollector')
+# chart = ChartModule([{"Label": "Sheep",
+#                       "Color": "green"},
+#                       {"Label": "Wolves",
+#                       "Color": "red"}],
+#                     data_collector_name='datacollector')
 
 # Create the server, and pass the grid and the graph
-server = ModularServer(WolfSheep,
-                       [grid, chart],
+server = ModularServer(RoadSim,
+                       [grid],
                        "WolfSheep Model",
                        {})
 
