@@ -86,6 +86,7 @@ class Car(Agent):
         self.x = self.new_x
         self.y = self.new_y
         self.model.grid.move_agent(self, (self.x, self.y))
+        self.model.stats()
 
     def advance(self):
         if self.model.grid.out_of_bounds((self.new_x+10, self.new_y)):
