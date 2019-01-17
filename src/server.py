@@ -7,7 +7,7 @@ from mesa.visualization.modules import ChartModule
 import IPython
 import os
 import sys
-from modelgrid import *
+from modelgrid import RoadSim
 
 # Change stdout so we can ignore most prints etc.
 #orig_stdout = sys.stdout
@@ -17,12 +17,12 @@ from modelgrid import *
 
 # You can change this to whatever ou want. Make sure to make the different types
 # of agents distinguishable
-colors = ['red', 'orange', 'yellow', 'green', 'pink']
+colors = {-1: "pink", 0: "green", 1: "#ccff33", 2: "yellow", 3: "orange", 4: "#cc6600", 5: "red"}
 def agent_portrayal(agent):
     portrayal = {"Shape": "arrowHead",
                 "Filled": "true",
                 "Layer": 10,
-                "Color": colors[agent.speed],
+                "Color": colors[agent.max_speed-agent.speed],
                 "Filled": "true",
                 "heading_x": 1,
                 "heading_y": 0,
