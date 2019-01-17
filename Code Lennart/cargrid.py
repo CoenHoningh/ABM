@@ -17,9 +17,6 @@ class Car(Agent):
         self.max_speed = speed
         self.new_x = 0
         self.new_y = start_lane
-        self.colormap = plt.get_cmap('Dark2')
-        r = random.random()
-        self.color = self.colormap(r)
 
     def _is_free(self, _view, _lane):
         '''
@@ -82,9 +79,8 @@ class Car(Agent):
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
             print("hoi")
             return
-        
+
         close = self.model.grid.get_neighbors(self.pos, 3, False)
-        self.color = self.colormap(len(close))
         for car in close:
             if car.y == self.y and car.x >= self.x:
                 pass
