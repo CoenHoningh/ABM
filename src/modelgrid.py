@@ -50,6 +50,15 @@ class RoadSim(Model):
         # self.carplot.set_color([car.color for car in self.cars])
         # self.visualise()
 
+    def stats(self):
+        """
+        retrieve the speed of each car to determine distribution
+        """
+        speed_dist = [i.speed for i in self.cars]
+        avg_car_speed = speed_dist.avg()
+        print(avg_car_speed)
+
+
     # def run_sim(self, steps=500):
     #     # self.visualise()
     #     for _ in range(steps):
@@ -58,12 +67,13 @@ class RoadSim(Model):
     #         print("hoi")
     #         self.init_cars()
     #         # plt.pause(0.001)
-    
+
     def visualise(self):
         plt.ion()
         self.fig = plt.figure(figsize=(50, 5), dpi=80)
         self.plot = self.fig.gca()
         self.road.visualise(self.plot)
+        # self.stats(self)
 
         # print(list(list(zip(*self.cars))[0]))
         # self.carplot = self.plot.scatter([car[0] for car in self.road.env._agent_points],
