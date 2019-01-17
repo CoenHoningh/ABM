@@ -21,7 +21,7 @@ colors = ['red', 'orange', 'yellow', 'green', 'pink']
 def agent_portrayal(agent):
     portrayal = {"Shape": "arrowHead",
                 "Filled": "true",
-                "Layer": 0,
+                "Layer": 10,
                 "Color": colors[agent.speed],
                 "Filled": "true",
                 "heading_x": 1,
