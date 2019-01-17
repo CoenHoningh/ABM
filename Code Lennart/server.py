@@ -31,13 +31,13 @@ def agent_portrayal(agent):
                 "scale": 10.0,}
     return portrayal
 
-number_of_lanes=3
+number_of_lanes=5
 length=1000
 
 
 
 # Create a grid of 20 by 20 cells, and display it as 500 by 500 pixels
-grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 60)
+grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 30 * number_of_lanes)
 
 # Create a dynamic linegraph
 # chart = ChartModule([{"Label": "Sheep",
