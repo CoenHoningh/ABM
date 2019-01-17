@@ -65,7 +65,7 @@ class Car(Agent):
             Slow down 1 tick if none are possible
             '''
             self.speed = max(self.speed-1, 0)
-            while not self._is_free(self.speed+2, 0):
+            while not self._is_free((self.speed+1)*self.speed, 0):
                 self.speed = max(self.speed-1, 0)
             self.new_x = self.x + self.speed
             self.new_y = self.y
