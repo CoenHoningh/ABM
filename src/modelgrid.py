@@ -3,6 +3,7 @@ from mesa.time import SimultaneousActivation
 from mesa.space import SingleGrid
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 import road
 import cargrid as car
@@ -55,7 +56,7 @@ class RoadSim(Model):
         retrieve the speed of each car to determine distribution
         """
         speed_dist = [i.speed for i in self.cars]
-        avg_car_speed = speed_dist.avg()
+        avg_car_speed = np.average(speed_dist)
         print(avg_car_speed)
 
 

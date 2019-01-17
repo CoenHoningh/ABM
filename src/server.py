@@ -54,6 +54,6 @@ server = ModularServer(RoadSim,
                        {"lanes":number_of_lanes, "length":length, "spawn_chance":
                         UserSettableParameter('slider', "Spawn Chance", 0.3, 0.001, 1.0, 0.01)})
 
-server.port = 8522
+server.port = 8526
 
 server.launch()
