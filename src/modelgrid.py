@@ -28,7 +28,7 @@ class RoadSim(Model):
         self.new_car(start_lane=1, speed=2)
 
     def init_cars(self):
-        speed = random.randint(3,3)
+        speed = 5
         print(self.lanes)
         for start_lane in range(self.lanes):
             free_space = [self.grid.is_cell_empty((x, start_lane)) for x in range(0,speed)]
