@@ -31,25 +31,22 @@ class Car(Agent):
         if _view == 0:
             return True
         _view = min(self.model.length-self.x-1, _view)
-        bool_list = [self.model.grid.is_cell_empty((self.x+x, self.y+_lane)) for x in range(_a, _view)]
-        if len(bool_list) == 0:
+        bool_list = [self.model.grid.is_cell_empty((self.x+x, self.y+_lane))
+                     for x in range(_a, _view)]
+        if not bool_list:
             return True
         return all(bool_list)
 
     def step(self):
         self.pos = (self.x, self.y)
-        if self.speed < 1:
-            print(self.speed)
-            print(self.unique_id)
-            print('...')
         if self._is_free(self.speed*2+1, 0):
             '''
             Move ahead if the current speed allows
             '''
             self.new_x = self.x + self.speed
-            self.speed = min(self.max_speed, self.speed+1)
+            #self.speed = min(self.max_speed, self.speed+1)
             if self.y > 0:
-                if self._is_free(self.speed*3, -1):
+                if self._is_free(self.speed*2+1, -1):
                     '''
                     Move a lane to the right if speed allows
                     '''
@@ -61,14 +58,14 @@ class Car(Agent):
             '''
             self.new_x = self.x + self.speed +1
             self.new_y = self.y + 1
-            self.speed = min(self.max_speed, self.speed+1)
+            #self.speed = min(self.max_speed, self.speed+1)
 
         else:
             '''
             Slow down 1 tick if none are possible
             '''
             self.speed = max(self.speed-1, 0)
-            while not self._is_free(self.speed+1, 0):
+            while not self._is_free(self.speed+2, 0):
                 self.speed = max(self.speed-1, 0)
             self.new_x = self.x + self.speed
             self.new_y = self.y
@@ -77,7 +74,6 @@ class Car(Agent):
                 print(self.speed)
 
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
-            print("hoi")
             return
 
         close = self.model.grid.get_neighbors(self.pos, 3, False)
@@ -89,7 +85,6 @@ class Car(Agent):
         # print("-----------------------------")
         self.x = self.new_x
         self.y = self.new_y
-        print('yo')
         self.model.grid.move_agent(self, (self.x, self.y))
 
     def advance(self):
