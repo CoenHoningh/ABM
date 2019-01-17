@@ -24,9 +24,11 @@ class Car(Agent):
             _view: how many places to look ahead
             _lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
-        if _lane != 0:
-            _a = 0
-        else:
+        _a = 0
+        if _lane == 0:
+            '''
+            Dont check current spot if staying in the same lane
+            '''
             _a = 1
         if _view == 0:
             return True
