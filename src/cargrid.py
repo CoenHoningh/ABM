@@ -108,11 +108,6 @@ class Car(Agent):
 
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
             return
-
-        # close = self.model.grid.get_neighbors(self.pos, 3, False)
-        # for car in close:
-        #     if car.y == self.y and car.x >= self.x:
-        #         pass
         self.x = self.new_x
         self.y = self.new_y
         self.model.grid.move_agent(self, (self.x, self.y))
