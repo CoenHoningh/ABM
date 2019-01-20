@@ -66,7 +66,7 @@ class Car(Agent):
                 self.new_y = self.y + 1
                 self.speed = 1
 
-        elif self.is_free((self.speed*1.3)+1):
+        elif self.is_free(int(self.speed*1.3)+1):
             '''
             Move ahead if the current speed allows
             '''
@@ -98,7 +98,7 @@ class Car(Agent):
             self.braked = 5
             self.speed = max(self.speed-1, 0)
             while self.speed and not\
-                    self.is_free((self.speed+1)*self.speed):
+                    self.is_free(int((self.speed+1)*self.speed)):
                 self.speed = max(self.speed-1, 0)
             self.new_x = self.x + self.speed
             self.new_y = self.y
@@ -109,13 +109,10 @@ class Car(Agent):
         if self.model.grid.out_of_bounds((self.new_x, self.y)):
             return
 
-        close = self.model.grid.get_neighbors(self.pos, 3, False)
-        for car in close:
-            if car.y == self.y and car.x >= self.x:
-                pass
-                # print(f"self.x = {self.x} \t\t other.x = {car.x}")
-                # print(f"self.y = {self.y} \t\t other.y = {car.y}")
-        # print("-----------------------------")
+        # close = self.model.grid.get_neighbors(self.pos, 3, False)
+        # for car in close:
+        #     if car.y == self.y and car.x >= self.x:
+        #         pass
         self.x = self.new_x
         self.y = self.new_y
         self.model.grid.move_agent(self, (self.x, self.y))
