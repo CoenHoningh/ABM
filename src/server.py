@@ -51,7 +51,7 @@ grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 30 * number_of
 server = ModularServer(RoadSim,
                        [grid],
                        "Road sim yo",
-                       {"lanes":number_of_lanes, "length":length, "spawn_chance":
+                       {"lanes": number_of_lanes, "length": length, "spawn_chance":
                         UserSettableParameter('slider', "Spawn Chance", 0.3, 0.001, 1.0, 0.01)})
 
 server.port = 8526
