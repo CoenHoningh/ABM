@@ -1,7 +1,6 @@
-from mesa import Model
 from mesa import Agent
-import random
-import matplotlib.pyplot as plt
+import numpy as np
+
 
 class Car(Agent):
     def __init__(self, unique_id, model, size=1, start_lane=0, speed=1):
@@ -10,6 +9,7 @@ class Car(Agent):
         self.size = size
         self.start_lane = start_lane
         self.lane = start_lane
+        self.maxlane = self.model.lanes-1
         self.x = 0
         self.y = start_lane
         self.pos = (self.x, self.y)
@@ -46,7 +46,7 @@ class Car(Agent):
             Move ahead if the current speed allows
             '''
             self.new_x = self.x + self.speed
-            #self.speed = min(self.max_speed, self.speed+1)
+            # self.speed = min(self.max_speed, self.speed+1)
             if self.y > 0:
                 if self._is_free(self.speed*2+1, -1):
                     '''
@@ -54,13 +54,13 @@ class Car(Agent):
                     '''
                     self.new_y = self.y - 1
 
-        elif self.y < (self.model.lanes-1) and self._is_free(self.speed*2+1, 1):
+        elif self.y < self.maxlane and self._is_free(self.speed*2+1, 1):
             '''
             Move a lane to the left if the speed allows
             '''
-            self.new_x = self.x + self.speed +1
+            self.new_x = self.x + self.speed + 1
             self.new_y = self.y + 1
-            #self.speed = min(self.max_speed, self.speed+1)
+            # self.speed = min(self.max_speed, self.speed+1)
 
         else:
             '''
@@ -88,7 +88,7 @@ class Car(Agent):
         self.x = self.new_x
         self.y = self.new_y
         self.model.grid.move_agent(self, (self.x, self.y))
-        self.model.stats()
+        # self.model.stats()
 
     def advance(self):
         if self.model.grid.out_of_bounds((self.new_x+10, self.new_y)):
@@ -97,7 +97,6 @@ class Car(Agent):
             self.model.schedule.remove(self)
             print(self.pos)
             return
-
 
     def visualize(self, plot):
         plot.scatter(self.x, self.y, s=100, marker='s')
