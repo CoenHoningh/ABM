@@ -26,14 +26,14 @@ def agent_portrayal(agent):
                  "Filled": "true",
                  "heading_x": 1,
                  "heading_y": 0,
-                 "text": agent.x,
+                 "text": agent.unique_id,
                  "text_color": "white",
                  "scale": 10.0}
     return portrayal
 
 
 number_of_lanes = 5
-length = 1000
+length = 2000
 
 
 grid = CanvasGrid(agent_portrayal, length,
