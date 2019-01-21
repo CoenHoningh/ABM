@@ -18,7 +18,7 @@ class RoadSim(Model):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, lanes=2, length=500, spawn_chance=0.3):
+    def __init__(self, lanes=2, length=500, spawn_chance=0.5):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
@@ -31,7 +31,7 @@ class RoadSim(Model):
 
         self.cars = []
         self.new_car()
-        self.new_car(start_lane=1, speed=2)
+        self.new_car(start_lane=1, speed=5)
 
         self.datacollector = DataCollector(
             model_reporters={
@@ -57,7 +57,7 @@ class RoadSim(Model):
             if self.is_free(speed, start_lane):
                 self.new_car(speed=speed, start_lane=start_lane)
 
-    def new_car(self, start_lane=0, speed=1):
+    def new_car(self, start_lane=0, speed=5):
         """
         Generates a new car object and adds it to the model scheduler.
         """
