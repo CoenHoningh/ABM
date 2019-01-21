@@ -7,7 +7,7 @@ from mesa.visualization.modules import ChartModule
 from modelgrid import RoadSim
 
 
-colors = {-1: "pink",
+COLORS = {-1: "pink",
           0: "green",
           1: "#ccff33",
           2: "yellow",
@@ -17,10 +17,12 @@ colors = {-1: "pink",
 
 
 def agent_portrayal(agent):
+    """
+    Properties of the agent visualization.
+    """
     portrayal = {"Shape": "arrowHead",
-                 "Filled": "true",
                  "Layer": 10,
-                 "Color": colors[agent.max_speed-agent.speed],
+                 "Color": COLORS[agent.max_speed-agent.speed],
                  "Filled": "true",
                  "heading_x": 1,
                  "heading_y": 0,
