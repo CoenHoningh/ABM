@@ -25,7 +25,7 @@ class Car(Agent):
             _view: how many places to look ahead
             _lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
-        _a = 0
+        _a = -2
         if _lane == 0:
             '''
             Dont check current spot if staying in the same lane
@@ -36,11 +36,14 @@ class Car(Agent):
         if self.maxlane < self.y + _lane < 0:
             return False
         _view = min(self.model.length-self.x-1, _view)
-        bool_list = [self.model.grid.is_cell_empty((self.x+x, self.y+_lane))
-                     for x in range(_a, _view+1)]
-        if not bool_list:
-            return True
-        return all(bool_list)
+        cells = [(self.x+x, self.y+_lane) for x in range(_a, _view+1)]
+        contents = self.model.grid.get_cell_list_contents(cells)
+        return not contents
+        # bool_list = [self.model.grid.is_cell_empty((self.x+x, self.y+_lane))
+        #              for x in range(_a, _view+1)]
+        # if not bool_list:
+        #     return True
+        # return all(bool_list)
 
     def is_slowed(self):
         """
@@ -61,18 +64,16 @@ class Car(Agent):
         """
         Perform the initial scheduled agent step.
         """
+        self.pos = (self.x, self.y)
         if not self.speed:
             if self.is_free(1):
                 self.x += 1
-                self.speed = 1
             elif self.is_free(1, -1):
                 self.x += 1
                 self.y -= 1
-                self.speed = 1
             elif self.is_free(1, 1):
                 self.x += 1
                 self.y += 1
-                self.speed = 1
 
         elif self.is_free(int(self.speed*1.3)+1):
             '''
@@ -104,18 +105,18 @@ class Car(Agent):
                 self.speed = max(self.speed-1, 0)
             self.x += self.speed
 
-        self.pos = (self.x, self.y)
-
         if self.model.grid.out_of_bounds(self.pos):
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
             return
 
-        self.model.grid.move_agent(self, self.pos)
+        self.model.grid.move_agent(self, (self.x, self.y))
 
-    def advance(self):
-        """
-        Perform the closing scheduled agent step.
-        """
+        self.pos = (self.x, self.y)
         if self.is_slowed():
             self.check_speed()
+
+    # def advance(self):
+    #     """
+    #     Perform the closing scheduled agent step.
+    #     """

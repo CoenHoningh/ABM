@@ -3,7 +3,7 @@ Creates the general road model in which the car agents reside.
 """
 import random
 from mesa import Model
-from mesa.time import SimultaneousActivation
+from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 import cargrid as car
@@ -23,7 +23,7 @@ class RoadSim(Model):
 
         self.grid = SingleGrid(self.length, self.lanes, True)
 
-        self.schedule = SimultaneousActivation(self)
+        self.schedule = RandomActivation(self)
 
         self.cars = []
         self.new_car()
