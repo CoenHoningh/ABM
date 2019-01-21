@@ -33,7 +33,7 @@ def agent_portrayal(agent):
 
 
 number_of_lanes = 5
-length = 2000
+length = 1000
 
 
 grid = CanvasGrid(agent_portrayal, length,
