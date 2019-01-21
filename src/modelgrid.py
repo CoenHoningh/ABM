@@ -11,9 +11,13 @@ from data_collection import avg_speed, lane_speeds
 
 
 class RoadSim(Model):
+
     """ Hosts the road model and the mesa grid.
     Contains methods to generate new car agents and collect data.
     """
+
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, lanes=2, length=500, spawn_chance=0.3):
         super().__init__()
         self.current_id = 0

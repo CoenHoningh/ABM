@@ -106,7 +106,7 @@ class Car(Agent):
                 self.speed = max(self.speed-1, 0)
             self.x += self.speed
 
-        if self.model.grid.out_of_bounds(self.pos):
+        if self.model.grid.out_of_bounds((self.x, self.y)):
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
             return
