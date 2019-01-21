@@ -1,6 +1,7 @@
 """ Module which defines the car agents
 """
 from mesa import Agent
+import numpy as np
 
 
 class Car(Agent):
@@ -56,7 +57,7 @@ class Car(Agent):
         Check if the car has recently braked and otherwise can speed up.
         """
         if self.braked:
-            self.braked -= 1
+            self.braked -= np.random.randint(0, self.braked+1)
         elif self.is_free(self.speed+1):
             self.speed += 1
 
