@@ -17,7 +17,7 @@ from modelgrid import *
 
 # You can change this to whatever ou want. Make sure to make the different types
 # of agents distinguishable
-colors = ['red', 'orange', 'yellow', 'green', 'pink']
+colors = ['red', 'orange', 'yellow', 'green', 'pink', 'brown']
 def agent_portrayal(agent):
     portrayal = {"Shape": "arrowHead",
                 "Filled": "true",
@@ -37,7 +37,7 @@ length=1000
 
 
 # Create a grid of 20 by 20 cells, and display it as 500 by 500 pixels
-grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 30 * number_of_lanes)
+grid = CanvasGrid(agent_portrayal, length, number_of_lanes, 5000, 40 * number_of_lanes)
 
 # Create a dynamic linegraph
 # chart = ChartModule([{"Label": "Sheep",
