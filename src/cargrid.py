@@ -8,7 +8,7 @@ class Car(Agent):
     """
     Defines the properties and behaviour of each car agent.
     """
-    def __init__(self, unique_id, model, start_lane=0, speed=1, afstand=25):
+    def __init__(self, unique_id, model, start_lane=0, speed=1):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
         self.lane = start_lane
@@ -18,7 +18,6 @@ class Car(Agent):
         self.speed = speed
         self.max_speed = speed
         self.braked = 0
-        self.afstand = afstand//self.model.gridsize
 
     def is_free(self, lane, view=1):
         '''
@@ -26,7 +25,7 @@ class Car(Agent):
             view: how many places to look ahead
             lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
-        view = self.afstand*view*(self.speed/self.max_speed)
+        view = self.speed*1.1
         a = -1*int(5*self.speed/self.max_speed)
         if lane == 0:
             '''

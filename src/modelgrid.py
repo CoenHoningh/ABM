@@ -23,7 +23,7 @@ class RoadSim(Model):
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn_chance
-        self.length = length*1000/gridsize
+        self.length = int(length*1000/gridsize)
 
         self.grid = SingleGrid(self.length, self.lanes, False)
         self.gridsize = gridsize
