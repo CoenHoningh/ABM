@@ -8,7 +8,7 @@ class Car(Agent):
     """
     Defines the properties and behaviour of each car agent.
     """
-    def __init__(self, unique_id, model, start_lane=0, speed=1):
+    def __init__(self, unique_id, model, start_lane=0, speed=1, afstand=25):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
         self.lane = start_lane
@@ -18,24 +18,26 @@ class Car(Agent):
         self.speed = speed
         self.max_speed = speed
         self.braked = 0
+        self.afstand = afstand//self.model.gridsize
 
-    def is_free(self, view, lane=0):
+    def is_free(self, lane, view=1):
         '''
         Checks if the lane is free.
             view: how many places to look ahead
             lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
-        a = -2
+        view = self.afstand*view*(self.speed/self.max_speed)
+        a = -1*int(5*self.speed/self.max_speed)
         if lane == 0:
             '''
-            Dont check current spot if staying in the same lane
+            Dont check behind if staying in the same lane
             '''
             a = 1
-        if view == 0:
-            return True
-        if (self.model.lanes-1) < (self.y + lane) < 0:
-            return False
         view = int(min(self.model.length-self.x-1, view))
+        if view == lane == 0:
+            return True
+        if not self.model.lanes > (self.y + lane) >= 0:
+            return False
         for x in range(a, view+1):
             if (self.x+x, self.y+lane) in self.model.occupied:
                 return False
@@ -61,40 +63,42 @@ class Car(Agent):
         """
         if self.braked:
             self.braked -= np.random.randint(0, self.braked+1)
-        elif self.is_free(self.speed+1):
-            self.speed += 1
+        diff = self.max_speed - self.speed
+        speedup = min(np.random.randint(1, diff+1), 10)
+        while speedup and not self.is_free(speedup):
+            speedup -= 1
+        self.speed += speedup
 
     def step(self):
         """
         Perform the initial scheduled agent step.
         """
-        if not self.speed:
-            if self.is_free(1):
+        if self.speed == 0:
+            if self.is_free(0):
                 self.x += 1
-            elif self.is_free(1, -1):
+            elif self.is_free(-1):
                 self.x += 1
                 self.y -= 1
-            elif self.is_free(1, 1):
+            elif self.is_free(1):
                 self.x += 1
                 self.y += 1
 
-        elif self.is_free(self.speed*1.3+1):
+        elif self.is_free(0):
             '''
             Move ahead if the current speed allows
             '''
             self.x += self.speed
-            if self.y > 0:
-                if self.is_free(self.speed*1.3+1, -1):
-                    '''
-                    Move a lane to the right if speed allows
-                    '''
-                    self.y -= 1
+            if self.is_free(-1):
+                '''
+                Move a lane to the right if speed allows
+                '''
+                self.y -= 1
 
-        elif self.is_free(self.speed*1.3+1, 1):
+        elif self.is_free(1):
             '''
             Move a lane to the left if the speed allows
             '''
-            self.x += self.speed + 1
+            self.x += self.speed
             self.y += 1
 
         else:
@@ -104,7 +108,7 @@ class Car(Agent):
             self.braked = 5
             self.speed = max(self.speed-1, 0)
             while self.speed and not\
-                    self.is_free((self.speed+1)*self.speed):
+                    self.is_free(0):
                 self.speed = max(self.speed-1, 0)
             self.x += self.speed
 
