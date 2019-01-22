@@ -9,7 +9,7 @@ def avg_speed(model):
     Computes the average speed of all cars.
     """
     speeds = [agent.speed for agent in model.schedule.agents]
-    return np.average(speeds)
+    return np.average(speeds)*3.6*model.gridsize
 
 
 def lane_speeds(model):

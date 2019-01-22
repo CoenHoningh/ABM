@@ -18,17 +18,18 @@ class RoadSim(Model):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, lanes=2, length=500, spawn_chance=0.5, speed=130):
+    def __init__(self, lanes=3, length=500, gridsize=0.5, spawn_chance=0.8, speed=130):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn_chance
-        self.length = length*speed
+        self.length = length*1000/gridsize
 
         self.grid = SingleGrid(self.length, self.lanes, False)
+        self.gridsize = gridsize
 
         self.schedule = RandomActivation(self)
-        self.speed = speed
+        self.speed = int(speed/3.6/gridsize)
         self.occupied = set()
 
         self.cars = []
@@ -37,8 +38,7 @@ class RoadSim(Model):
 
         self.datacollector = DataCollector(
             model_reporters={
-                "Avg_speed": avg_speed,
-                "Lane_speed": lane_speeds},
+                "Avg_speed": avg_speed},
             agent_reporters={},
             tables={})
 
@@ -47,7 +47,7 @@ class RoadSim(Model):
         Checks if a car can spawn in a given lane.
         """
         for x in range(self.speed):
-            if (x, lane) not in self.grid.empties:
+            if (x, lane) in self.occupied:
                 return False
         return True and random.random() < self.spawn_chance
 
@@ -78,10 +78,14 @@ class RoadSim(Model):
         global occupied set which allows for very fast lookups compared to
         the empties list. The agent pos variable is also updated.
         """
+        # print(agent.unique_id, agent.pos, pos, agent.speed)
         self.occupied.remove(agent.pos)
         if self.grid.out_of_bounds(pos):
+            # print(agent.unique_id)
             self.grid.remove_agent(agent)
             self.schedule.remove(agent)
+            if agent in self.cars:
+                self.cars.remove(agent)
             return
         self.occupied.add(pos)
         self.grid.move_agent(agent, pos)
