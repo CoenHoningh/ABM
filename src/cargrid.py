@@ -12,7 +12,6 @@ class Car(Agent):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
         self.lane = start_lane
-        self.maxlane = self.model.lanes-1
         self.x = 0
         self.y = start_lane
         self.pos = (self.x, self.y)
@@ -20,26 +19,30 @@ class Car(Agent):
         self.max_speed = speed
         self.braked = 0
 
-    def is_free(self, _view, _lane=0):
+    def is_free(self, view, lane=0):
         '''
         Checks if the lane is free.
-            _view: how many places to look ahead
-            _lane: which lane to check: -1 = right, 0 = same, 1 = left
+            view: how many places to look ahead
+            lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
-        _a = -2
-        if _lane == 0:
+        a = -2
+        if lane == 0:
             '''
             Dont check current spot if staying in the same lane
             '''
-            _a = 1
-        if _view == 0:
+            a = 1
+        if view == 0:
             return True
-        if self.maxlane < self.y + _lane < 0:
+        if (self.model.lanes-1) < (self.y + lane) < 0:
             return False
-        _view = min(self.model.length-self.x-1, _view)
-        cells = [(self.x+x, self.y+_lane) for x in range(_a, _view+1)]
-        contents = self.model.grid.get_cell_list_contents(cells)
-        return not contents
+        view = int(min(self.model.length-self.x-1, view))
+        for x in range(a, view+1):
+            if (self.x+x, self.y+lane) in self.model.occupied:
+                return False
+        return True
+        # cells = [(self.x+x, self.y+_lane) for x in range(_a, _view+1)]
+        # contents = self.model.grid.get_cell_list_contents(cells)
+        # return not contents
         # bool_list = [self.model.grid.is_cell_empty((self.x+x, self.y+_lane))
         #              for x in range(_a, _view+1)]
         # if not bool_list:
@@ -65,7 +68,6 @@ class Car(Agent):
         """
         Perform the initial scheduled agent step.
         """
-        self.pos = (self.x, self.y)
         if not self.speed:
             if self.is_free(1):
                 self.x += 1
@@ -76,19 +78,19 @@ class Car(Agent):
                 self.x += 1
                 self.y += 1
 
-        elif self.is_free(int(self.speed*1.3)+1):
+        elif self.is_free(self.speed*1.3+1):
             '''
             Move ahead if the current speed allows
             '''
             self.x += self.speed
             if self.y > 0:
-                if self.is_free(int(self.speed*1.3)+1, -1):
+                if self.is_free(self.speed*1.3+1, -1):
                     '''
                     Move a lane to the right if speed allows
                     '''
                     self.y -= 1
 
-        elif self.y < self.maxlane and self.is_free(int(self.speed*1.3)+1, 1):
+        elif self.is_free(self.speed*1.3+1, 1):
             '''
             Move a lane to the left if the speed allows
             '''
@@ -102,18 +104,12 @@ class Car(Agent):
             self.braked = 5
             self.speed = max(self.speed-1, 0)
             while self.speed and not\
-                    self.is_free(int((self.speed+1)*self.speed)):
+                    self.is_free((self.speed+1)*self.speed):
                 self.speed = max(self.speed-1, 0)
             self.x += self.speed
 
-        if self.model.grid.out_of_bounds((self.x, self.y)):
-            self.model.grid.remove_agent(self)
-            self.model.schedule.remove(self)
-            return
+        self.model.move(self, (self.x, self.y))
 
-        self.model.grid.move_agent(self, (self.x, self.y))
-
-        self.pos = (self.x, self.y)
         if self.is_slowed():
             self.check_speed()
 
