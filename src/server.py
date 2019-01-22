@@ -36,8 +36,8 @@ number_of_lanes = 5
 length = 1000
 
 
-grid = CanvasGrid(agent_portrayal, length,
-                  number_of_lanes, 5000, 30 * number_of_lanes)
+# grid = CanvasGrid(agent_portrayal, length,
+#                   number_of_lanes, 5000, 30 * number_of_lanes)
 
 # Create a dynamic linegraph
 chart = ChartModule([{"Label": "Avg_speed",
@@ -47,14 +47,18 @@ chart = ChartModule([{"Label": "Avg_speed",
 
 # Create the server, and pass the grid and the graph
 server = ModularServer(RoadSim,
-                       [grid, chart],
+                       [chart],
                        "Road sim yo",
                        {"lanes": number_of_lanes,
                         "length": length,
                         "spawn_chance":
                             UserSettableParameter('slider',
                                                   "Spawn Chance",
-                                                  0.5, 0.0, 1.0, 0.05)})
+                                                  0.5, 0.0, 1.0, 0.05),
+                        "speed":
+                            UserSettableParameter('slider',
+                                                  'Maximum speed',
+                                                  130, 0.0, 200, 1.0)})
 
 server.port = 8526
 

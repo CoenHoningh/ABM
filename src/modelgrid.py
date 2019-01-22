@@ -18,55 +18,74 @@ class RoadSim(Model):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, lanes=2, length=500, spawn_chance=0.5):
+    def __init__(self, lanes=2, length=500, spawn_chance=0.5, speed=130):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn_chance
-        self.length = length
+        self.length = length*speed
 
-        self.grid = SingleGrid(self.length, self.lanes, True)
+        self.grid = SingleGrid(self.length, self.lanes, False)
 
         self.schedule = RandomActivation(self)
+        self.speed = speed
+        self.occupied = set()
 
         self.cars = []
         self.new_car()
-        self.new_car(start_lane=1, speed=5)
+        self.new_car(start_lane=1)
 
         self.datacollector = DataCollector(
             model_reporters={
                 "Avg_speed": avg_speed,
                 "Lane_speed": lane_speeds},
-            agent_reporters={})
+            agent_reporters={},
+            tables={})
 
-    def is_free(self, speed, lane):
+    def is_free(self, lane):
         """
         Checks if a car can spawn in a given lane.
         """
-        for x in range(speed):
-            if not self.grid.is_cell_empty((x, lane)):
+        for x in range(self.speed):
+            if (x, lane) not in self.grid.empties:
                 return False
         return True and random.random() < self.spawn_chance
 
-    def init_cars(self, speed=5):
+    def init_cars(self):
         """
         Loops over all lanes and randomly creates a new car object if
         sufficient space is available.
         """
         for start_lane in range(self.lanes):
-            if self.is_free(speed, start_lane):
-                self.new_car(speed=speed, start_lane=start_lane)
+            if self.is_free(start_lane):
+                self.new_car(start_lane=start_lane)
 
-    def new_car(self, start_lane=0, speed=5):
+    def new_car(self, start_lane=0):
         """
         Generates a new car object and adds it to the model scheduler.
         """
         new_car = car.Car(self.next_id(), self,
-                          start_lane=start_lane, speed=speed)
+                          start_lane=start_lane, speed=self.speed)
 
         self.grid.place_agent(new_car, (new_car.x, new_car.y))
         self.cars.append(new_car)
         self.schedule.add(new_car)
+        self.occupied.add((new_car.x, new_car.y))
+
+    def move(self, agent, pos):
+        """
+        Wrapper method on the mesa move agent method, also updates the
+        global occupied set which allows for very fast lookups compared to
+        the empties list. The agent pos variable is also updated.
+        """
+        self.occupied.remove(agent.pos)
+        if self.grid.out_of_bounds(pos):
+            self.grid.remove_agent(agent)
+            self.schedule.remove(agent)
+            return
+        self.occupied.add(pos)
+        self.grid.move_agent(agent, pos)
+        agent.pos = pos
 
     def step(self):
         self.datacollector.collect(self)
