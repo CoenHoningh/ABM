@@ -1,2 +1,4 @@
 mesa
 numpy
+tqdm
+matplotlib
