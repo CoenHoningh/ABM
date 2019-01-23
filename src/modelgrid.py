@@ -2,6 +2,7 @@
 Creates the general road model in which the car agents reside.
 """
 import random
+import numpy as np
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import SingleGrid
@@ -18,12 +19,14 @@ class RoadSim(Model):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, lanes=3, length=5, gridsize=0.5, spawn_chance=0.6, speed=100):
+    def __init__(self, lanes=3, length=5, gridsize=0.1, spawn=[0.4, 0.6],
+                 speed=100, sim_time=10000, init_time=1000):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
-        self.spawn_chance = spawn_chance
+        self.spawn_chance = spawn[0]
         self.length = int(length*1000/gridsize)
+        self.init_time = init_time
 
         self.grid = SingleGrid(self.length, self.lanes, False)
         self.gridsize = gridsize
@@ -31,6 +34,9 @@ class RoadSim(Model):
         self.schedule = RandomActivation(self)
         self.speed = int(speed/3.6/gridsize)
         self.occupied = set()
+        self.__bla = np.polynomial.polynomial.polyfit(
+            [init_time, (sim_time/2)+init_time, sim_time+init_time],
+            [spawn[0], spawn[1], spawn[0]], deg=2)
 
         self.cars = []
         self.new_car()
@@ -44,6 +50,16 @@ class RoadSim(Model):
                 },
             agent_reporters={},
             tables={'Positions': ['x', 'y']})
+        self.__init_sim()
+
+    def __update_rate(self):
+        self.spawn_chance = np.polynomial.polynomial.polyval(
+            self.schedule.time, self.__bla)
+
+    def __init_sim(self):
+        for _ in range(self.init_time):
+            self.schedule.step()
+            self.init_cars()
 
     def is_free(self, lane):
         """
@@ -103,14 +119,15 @@ class RoadSim(Model):
     def step(self):
         self.schedule.step()
         self.init_cars()
-        if self.schedule.time > 2000:
-            self.datacollector.collect(self)
-            if self.schedule.time == 10000:
-                print('saving')
-                for agent in self.cars:
-                    self.datacollector.add_table_row('Positions',
-                                                     {'x': agent.x, 'y': agent.y})
-                print('done')
+        self.datacollector.collect(self)
+        self.__update_rate()
+
+    def get_positions(self):
+        print('saving')
+        for agent in self.cars:
+            self.datacollector.add_table_row('Positions',
+                                             {'x': agent.x, 'y': agent.y})
+        print('done')
 
     # def stats(self):
     #     """
