@@ -16,7 +16,14 @@ def lane_speeds(model):
     """
     Computes the average speed of all cars per lane.
     """
-    speeds = [[]]*model.lanes
+    speeds = [[] for a in range(model.lanes)]
     for agent in model.schedule.agents:
-        speeds[agent.lane].append(agent.speed)
-    return [np.mean(x) for x in speeds]
+        speeds[agent.y].append(agent.speed)
+    return [np.average(x)*3.6*model.gridsize for x in speeds]
+
+
+def cars_in_lane(model):
+    nums = [0 for a in range(model.lanes)]
+    for agent in model.schedule.agents:
+        nums[agent.y] += 1
+    return nums

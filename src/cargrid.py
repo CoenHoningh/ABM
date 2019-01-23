@@ -11,7 +11,6 @@ class Car(Agent):
     def __init__(self, unique_id, model, start_lane=0, speed=1):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
-        self.lane = start_lane
         self.x = 0
         self.y = start_lane
         self.pos = (self.x, self.y)
@@ -33,8 +32,8 @@ class Car(Agent):
             '''
             a = 1
         view = int(min(self.model.length-self.x-1, view))
-        if view == lane == 0:
-            return True
+        if view == 0:
+            return (self.x+1, self.y+lane) in self.model.grid.empties
         if not self.model.lanes > (self.y + lane) >= 0:
             return False
         for x in range(a, view+1):

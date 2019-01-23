@@ -7,7 +7,7 @@ from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 import cargrid as car
-from data_collection import avg_speed, lane_speeds
+from data_collection import avg_speed, lane_speeds, cars_in_lane
 
 
 class RoadSim(Model):
@@ -18,7 +18,7 @@ class RoadSim(Model):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, lanes=3, length=500, gridsize=0.5, spawn_chance=0.8, speed=130):
+    def __init__(self, lanes=3, length=500, gridsize=0.5, spawn_chance=0.3, speed=100):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
@@ -38,9 +38,12 @@ class RoadSim(Model):
 
         self.datacollector = DataCollector(
             model_reporters={
-                "Avg_speed": avg_speed},
+                "Avg_speed": avg_speed,
+                'Lane_speeds': lane_speeds,
+                'Cars_in_lane': cars_in_lane
+                },
             agent_reporters={},
-            tables={})
+            tables={'Positions': ['x', 'y']})
 
     def is_free(self, lane):
         """
@@ -67,7 +70,7 @@ class RoadSim(Model):
         new_car = car.Car(self.next_id(), self,
                           start_lane=start_lane, speed=self.speed)
 
-        self.grid.place_agent(new_car, (new_car.x, new_car.y))
+        self.grid.position_agent(new_car, x=new_car.x, y=new_car.y)
         self.cars.append(new_car)
         self.schedule.add(new_car)
         self.occupied.add((new_car.x, new_car.y))
@@ -87,6 +90,12 @@ class RoadSim(Model):
             if agent in self.cars:
                 self.cars.remove(agent)
             return
+        if pos in self.occupied:
+            print('error')
+            print(agent.unique_id)
+            print(agent.speed)
+            print(pos)
+            print(self.occupied & self.grid.empties)
         self.occupied.add(pos)
         self.grid.move_agent(agent, pos)
         agent.pos = pos
@@ -95,6 +104,12 @@ class RoadSim(Model):
         self.datacollector.collect(self)
         self.schedule.step()
         self.init_cars()
+        if self.schedule.time == 1000:
+            print('saving')
+            for agent in self.cars:
+                self.datacollector.add_table_row('Positions',
+                                                 {'x': agent.x, 'y': agent.y})
+            print('done')
 
     # def stats(self):
     #     """
