@@ -18,7 +18,7 @@ class RoadSim(Model):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, lanes=3, length=500, gridsize=0.5, spawn_chance=0.3, speed=100):
+    def __init__(self, lanes=3, length=5, gridsize=0.5, spawn_chance=0.6, speed=100):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
@@ -101,15 +101,16 @@ class RoadSim(Model):
         agent.pos = pos
 
     def step(self):
-        self.datacollector.collect(self)
         self.schedule.step()
         self.init_cars()
-        if self.schedule.time == 1000:
-            print('saving')
-            for agent in self.cars:
-                self.datacollector.add_table_row('Positions',
-                                                 {'x': agent.x, 'y': agent.y})
-            print('done')
+        if self.schedule.time > 2000:
+            self.datacollector.collect(self)
+            if self.schedule.time == 10000:
+                print('saving')
+                for agent in self.cars:
+                    self.datacollector.add_table_row('Positions',
+                                                     {'x': agent.x, 'y': agent.y})
+                print('done')
 
     # def stats(self):
     #     """
