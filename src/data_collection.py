@@ -23,7 +23,4 @@ def lane_speeds(model):
 
 
 def cars_in_lane(model):
-    nums = [0 for a in range(model.lanes)]
-    for agent in model.schedule.agents:
-        nums[agent.y] += 1
-    return nums
+    return len(model.schedule.agents)
