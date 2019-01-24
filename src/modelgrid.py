@@ -6,7 +6,8 @@ import numpy as np
 from tqdm import tqdm
 from mesa import Model
 from mesa.time import RandomActivation
-from mesa.space import SingleGrid
+# from mesa.space import SingleGrid
+from space import SingleGrid
 from mesa.datacollection import DataCollector
 import cargrid as car
 from data_collection import avg_speed, lane_speeds, cars_in_lane
