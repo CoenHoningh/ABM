@@ -21,26 +21,21 @@ class Car(Agent):
         self.distance = distance
         self.agression = agression
         self.braked = 0
+        self.move = -1
 
-    def is_free(self, lane, view=0):
+    def is_free(self, lane, view=2):
         '''
         Checks if the lane is free.
             view: how many places to look ahead
             lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
-        view = self.speed*self.distance+view
-        a = -1*int(5*self.speed/self.max_speed)
-        if lane == 0:
-            '''
-            Dont check behind if staying in the same lane
-            '''
-            a = 1
-        view = int(view)
-        if view == 0:
+        front_view = int(self.speed*self.distance+view)
+        back_view = -1*abs(int(5*self.speed/self.max_speed)*lane)
+        if front_view == 0:
             return (self.x+1, self.y+lane) in self.model.grid.empties
         if not self.model.lanes > (self.y + lane) >= 0:
             return False
-        for x in range(a, view+1):
+        for x in range(front_view, back_view, -1):
             if (self.x+x, self.y+lane) in self.model.occupied:
                 return False
         return True
@@ -76,13 +71,17 @@ class Car(Agent):
         """
         Perform the initial scheduled agent step.
         """
+        self.move = -1
         if self.speed == 0:
             if self.is_free(0):
+                self.move = 1
                 self.x += 1
             elif self.is_free(-1):
+                self.move = 2
                 self.x += 1
                 self.y -= 1
             elif self.is_free(1):
+                self.move = 3
                 self.x += 1
                 self.y += 1
 
@@ -90,37 +89,44 @@ class Car(Agent):
             '''
             Move ahead if the current speed allows
             '''
-            self.x += self.speed
-            if self.is_free(-1, view=self.agression)\
-               and random.random() < self.agression:
+            self.move = 4
+            if (self.is_free(-1) and (random.random() < self.agression)):
                 '''
                 Move a lane to the right if speed allows
                 '''
+                self.move = 5
                 self.y -= 1
+                self.x += self.speed
+            else:
+                self.x += self.speed
 
-        elif self.is_free(1, view=self.agression):
+        elif self.is_free(1):
             '''
             Move a lane to the left if the speed allows
             '''
             self.x += self.speed
             self.y += 1
+            self.move = 6
 
         elif self.is_free(-1):
             self.x += self.speed
             self.y -= 1
+            self.move = 7
 
         else:
             '''
             Slow down 1 tick if none are possible
             '''
+            self.move = 8
             self.braked = 2
             self.speed = max(self.speed-1, 0)
             while self.speed and not\
                     self.is_free(0):
                 self.speed = max(self.speed-1, 0)
+                self.move += 1
             self.x += self.speed
 
-        self.model.move(self, (int(self.x), int(self.y)))
+        self.model.move(self, (self.x, self.y))
 
         if self.is_slowed():
             self.check_speed()

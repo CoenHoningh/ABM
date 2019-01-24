@@ -6,9 +6,9 @@ import numpy as np
 from tqdm import tqdm
 from mesa import Model
 from mesa.time import RandomActivation
+from mesa.datacollection import DataCollector
 # from mesa.space import SingleGrid
 from space import SingleGrid
-from mesa.datacollection import DataCollector
 import cargrid as car
 from data_collection import avg_speed, lane_speeds, cars_in_lane
 
@@ -20,13 +20,14 @@ class RoadSim(Model):
     """
 
     # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-arguments
 
-    def __init__(self, lanes=3, length=5, gridsize=0.1, spawn=[0.4, 0.6],
-                 speed=100, sim_time=10000, init_time=1000):
+    def __init__(self, lanes=3, length=5, gridsize=0.1, spawn=0.4,
+                 speed=100, sim_time=1000, init_time=100):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
-        self.spawn_chance = spawn[0]
+        self.spawn_chance = spawn
         self.length = int(length*1000/gridsize)
         self.init_time = init_time
 
@@ -36,10 +37,6 @@ class RoadSim(Model):
         self.schedule = RandomActivation(self)
         self.speed = int(speed/3.6/gridsize)
         self.occupied = set()
-        self.__bla = np.polynomial.polynomial.polyfit(
-            [init_time, (sim_time/2)+init_time, sim_time+init_time],
-            [spawn[0], spawn[1], spawn[0]], deg=2)
-
         self.cars = []
         self.new_car()
         self.new_car(start_lane=1)
@@ -54,10 +51,6 @@ class RoadSim(Model):
             tables={'Positions': ['x', 'y']})
         self.__init_sim()
         print('Starting run')
-
-    def __update_rate(self):
-        self.spawn_chance = np.polynomial.polynomial.polyval(
-            self.schedule.time, self.__bla)
 
     def __init_sim(self):
         print('Initializing model')
@@ -112,10 +105,11 @@ class RoadSim(Model):
             return
         if pos in self.occupied:
             print('error')
-            print(agent.unique_id)
-            print(agent.speed)
-            print(pos)
-            print(self.occupied & self.grid.empties)
+            print('agent id', agent.unique_id)
+            print('agent speed', agent.speed)
+            print('pos', pos)
+            print('in occupied and empties', self.occupied & self.grid.empties)
+            print('agent move', agent.move)
         self.occupied.add(pos)
         self.grid.move_agent(agent, pos)
         agent.pos = pos
@@ -124,7 +118,6 @@ class RoadSim(Model):
         self.schedule.step()
         self.init_cars()
         self.datacollector.collect(self)
-        self.__update_rate()
 
     def get_positions(self):
         print('saving')
