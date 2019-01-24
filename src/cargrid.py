@@ -1,7 +1,7 @@
 """ Module which defines the car agents
 """
-from mesa import Agent
 import random
+from mesa import Agent
 import numpy as np
 
 
@@ -9,7 +9,8 @@ class Car(Agent):
     """
     Defines the properties and behaviour of each car agent.
     """
-    def __init__(self, unique_id, model, start_lane=0, speed=100):
+    def __init__(self, unique_id, model, start_lane=0, speed=100,
+                 distance=1.1, agression=1.0):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
         self.x = 0
@@ -17,6 +18,8 @@ class Car(Agent):
         self.pos = (self.x, self.y)
         self.speed = speed
         self.max_speed = speed
+        self.distance = distance
+        self.agression = agression
         self.braked = 0
 
     def is_free(self, lane, view=0):
@@ -25,7 +28,7 @@ class Car(Agent):
             view: how many places to look ahead
             lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
-        view = self.speed*1.1+view
+        view = self.speed*self.distance+view
         a = -1*int(5*self.speed/self.max_speed)
         if lane == 0:
             '''
@@ -64,7 +67,7 @@ class Car(Agent):
             self.braked -= 1
             return
         diff = self.max_speed - self.speed
-        speedup = min(np.random.randint(1, diff+2), 10)
+        speedup = min(np.random.randint(0, diff), 10*self.agression)
         while speedup and not self.is_free(0, view=speedup):
             speedup -= 1
         self.speed += speedup
@@ -88,13 +91,14 @@ class Car(Agent):
             Move ahead if the current speed allows
             '''
             self.x += self.speed
-            if self.is_free(-1) and random.random() < 0.2:
+            if self.is_free(-1, view=self.agression)\
+               and random.random() < self.agression:
                 '''
                 Move a lane to the right if speed allows
                 '''
                 self.y -= 1
 
-        elif self.is_free(1):
+        elif self.is_free(1, view=self.agression):
             '''
             Move a lane to the left if the speed allows
             '''
