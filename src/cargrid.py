@@ -120,7 +120,7 @@ class Car(Agent):
                 self.speed = max(self.speed-1, 0)
             self.x += self.speed
 
-        self.model.move(self, (self.x, self.y))
+        self.model.move(self, (int(self.x), int(self.y)))
 
         if self.is_slowed():
             self.check_speed()
