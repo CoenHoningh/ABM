@@ -32,12 +32,13 @@ def agent_portrayal(agent):
     return portrayal
 
 
-number_of_lanes = 5
+number_of_lanes = 3
 length = 1000
 
 
 # grid = CanvasGrid(agent_portrayal, length,
 #                   number_of_lanes, 5000, 30 * number_of_lanes)
+
 
 # Create a dynamic linegraph
 chart = ChartModule([{"Label": "Avg_speed",
