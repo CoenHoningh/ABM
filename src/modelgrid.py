@@ -3,6 +3,7 @@ Creates the general road model in which the car agents reside.
 """
 import random
 import numpy as np
+from tqdm import tqdm
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import SingleGrid
@@ -51,13 +52,15 @@ class RoadSim(Model):
             agent_reporters={},
             tables={'Positions': ['x', 'y']})
         self.__init_sim()
+        print('Starting run')
 
     def __update_rate(self):
         self.spawn_chance = np.polynomial.polynomial.polyval(
             self.schedule.time, self.__bla)
 
     def __init_sim(self):
-        for _ in range(self.init_time):
+        print('Initializing model')
+        for _ in tqdm(range(self.init_time)):
             self.schedule.step()
             self.init_cars()
 
