@@ -10,6 +10,7 @@ from mesa.datacollection import DataCollector
 # from mesa.space import SingleGrid
 from space import SingleGrid
 import cargrid as car
+from lane_grid import LaneSpace
 from data_collection import avg_speed, lane_speeds, cars_in_lane
 
 
@@ -28,15 +29,13 @@ class RoadSim(Model):
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn
-        self.length = int(length*1000/gridsize)
+        self.length = length*1000
         self.init_time = init_time
 
-        self.grid = SingleGrid(self.length, self.lanes, False)
-        self.gridsize = gridsize
+        self.grid = LaneSpace(self.length, self.lanes)
 
         self.schedule = RandomActivation(self)
-        self.speed = int(speed/3.6/gridsize)
-        self.occupied = set()
+        self.speed = speed/3.6
         self.cars = []
         self.new_car()
         self.new_car(start_lane=1)
@@ -83,10 +82,9 @@ class RoadSim(Model):
         new_car = car.Car(self.next_id(), self,
                           start_lane=start_lane, speed=self.speed)
 
-        self.grid.position_agent(new_car, x=new_car.x, y=new_car.y)
+        self.grid.place_agent(new_car)
         self.cars.append(new_car)
         self.schedule.add(new_car)
-        self.occupied.add((new_car.x, new_car.y))
 
     def move(self, agent, pos):
         """

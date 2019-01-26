@@ -28,24 +28,24 @@ class LaneSpace:
             indexed following the same rules as the positions array.
     """
 
-    def __init__(self, lanes, length, scale=1):
+    def __init__(self, length, lanes, scale=1):
         """
         Initialize the highway space.
 
         Args:
-            lanes: The number of lanes
             length: The length of the highway in meters
+            lanes: The number of lanes
             scale: Value to scale the position array by, relative to
                 the system length. Can be used to increase the capacity
                 of decrease memory usage.
         """
-        self.lanes = lanes
         self.length = int(length*scale)
+        self.lanes = lanes
         print(f"Using {self.length*self.lanes*16/1000000}MB of memory")
         self.positions = np.full((self.lanes, self.length), np.nan)
         self.speeds = np.full((self.lanes, self.length), np.nan)
 
-    def place_agent(self, agent, pos):
+    def place_agent(self, agent):
         """
         Place an agent on the highway space.
 
@@ -53,10 +53,8 @@ class LaneSpace:
             agent: an agent instance which should have a speed and
                 index property. Representing the agent speed and unique_id
                 modulo length respectively
-            pos: The position the agent is placed at, should be a 2-tuple
-                containing the horizontal position and lane number.
         """
-        loc, lane = pos
+        loc, lane = agent.pos
         self.positions[lane, agent.index] = loc
         self.speeds[lane, agent.index] = agent.speed
         agent.pos = (loc, lane)
