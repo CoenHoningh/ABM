@@ -23,14 +23,15 @@ class RoadSim(Model):
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
 
-    def __init__(self, lanes=3, length=5, gridsize=0.1, spawn=0.4,
+    def __init__(self, lanes=3, length=5000, spawn=0.4,
                  speed=100, sim_time=1000, init_time=100):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn
-        self.length = length*1000
+        self.length = int(length)
         self.init_time = init_time
+        self.sim_time = sim_time
 
         self.grid = LaneSpace(self.length, self.lanes)
 
@@ -57,23 +58,21 @@ class RoadSim(Model):
             self.schedule.step()
             self.init_cars()
 
-    def is_free(self, lane):
+    def get_free_lanes(self):
         """
-        Checks if a car can spawn in a given lane.
+        Returns a bool arary of the availability of each lane.
         """
-        for x in range(self.speed):
-            if (x, lane) in self.occupied:
-                return False
-        return True and random.random() < self.spawn_chance
+        return np.count_nonzero(self.grid.positions < self.speed, axis=1) == 0
 
     def init_cars(self):
         """
         Loops over all lanes and randomly creates a new car object if
         sufficient space is available.
         """
-        for start_lane in range(self.lanes):
-            if self.is_free(start_lane):
-                self.new_car(start_lane=start_lane)
+        free_lanes = self.get_free_lanes()
+        for i in range(self.lanes):
+            if free_lanes[i] and random.random() < self.spawn_chance:
+                self.new_car(i)
 
     def new_car(self, start_lane=0):
         """
@@ -86,31 +85,19 @@ class RoadSim(Model):
         self.cars.append(new_car)
         self.schedule.add(new_car)
 
-    def move(self, agent, pos):
+    def move(self, agent, new_lane):
         """
         Wrapper method on the mesa move agent method, also updates the
         global occupied set which allows for very fast lookups compared to
         the empties list. The agent pos variable is also updated.
         """
-        # print(agent.unique_id, agent.pos, pos, agent.speed)
-        self.occupied.remove(agent.pos)
-        if self.grid.out_of_bounds(pos):
+        has_moved = self.grid.move_agent(agent, new_lane)
+        if not has_moved:
             # print(agent.unique_id)
             self.grid.remove_agent(agent)
             self.schedule.remove(agent)
-            if agent in self.cars:
-                self.cars.remove(agent)
+            self.cars.remove(agent)
             return
-        if pos in self.occupied:
-            print('error')
-            print('agent id', agent.unique_id)
-            print('agent speed', agent.speed)
-            print('pos', pos)
-            print('in occupied and empties', self.occupied & self.grid.empties)
-            print('agent move', agent.move)
-        self.occupied.add(pos)
-        self.grid.move_agent(agent, pos)
-        agent.pos = pos
 
     def step(self):
         self.schedule.step()

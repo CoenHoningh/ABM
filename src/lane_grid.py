@@ -77,11 +77,14 @@ class LaneSpace:
         loc, lane = agent.pos
         if loc+agent.speed > self.length:
             return False
+        new_loc = loc + agent.speed
+        new_lane = lane + lane_switch
         if lane_switch:
             self.positions[lane, agent.index] = np.nan
             self.speeds[lane, agent.index] = np.nan
-        self.positions[lane+lane_switch, agent.index] = (loc+agent.speed)
-        self.speeds[lane+lane_switch, agent.index] = (agent.speed)
+        self.positions[new_lane, agent.index] = new_loc
+        self.speeds[new_lane, agent.index] = agent.speed
+        agent.pos = (new_loc, new_lane)
         return True
 
     def remove_agent(self, agent):
