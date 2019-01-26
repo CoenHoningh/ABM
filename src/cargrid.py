@@ -13,6 +13,7 @@ class Car(Agent):
                  distance=1.1, agression=1.0):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
+        self.index = self.unique_id % model.length
         self.x = 0
         self.y = start_lane
         self.pos = (self.x, self.y)
