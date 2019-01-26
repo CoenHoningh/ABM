@@ -108,7 +108,7 @@ class RoadSim(Model):
         print('saving')
         for agent in self.cars:
             self.datacollector.add_table_row('Positions',
-                                             {'x': agent.x, 'y': agent.y})
+                                             {'x': agent.pos[0], 'y': agent.pos[1]})
         print('done')
 
     # def stats(self):
