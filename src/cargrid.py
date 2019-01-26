@@ -9,22 +9,19 @@ class Car(Agent):
     """
     Defines the properties and behaviour of each car agent.
     """
-    def __init__(self, unique_id, model, start_lane=0, speed=100,
-                 distance=1.1, agression=1.0):
+    def __init__(self, unique_id, model, start_lane, speed):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
         self.index = self.unique_id % model.length
-        self.x = 0
-        self.y = start_lane
-        self.pos = (self.x, self.y)
+        self.loc = 0.0
+        self.lane = start_lane
+        self.pos = (self.loc, self.lane)
         self.speed = speed
         self.max_speed = speed
-        self.distance = distance
-        self.agression = agression
         self.braked = 0
         self.move = -1
 
-    def is_free(self, lane, view=2):
+    def get_move(self, lane, view=2):
         '''
         Checks if the lane is free.
             view: how many places to look ahead
