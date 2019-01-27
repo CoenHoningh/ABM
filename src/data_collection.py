@@ -19,7 +19,7 @@ def lane_speeds(model):
     speeds = [[] for a in range(model.lanes)]
     for agent in model.schedule.agents:
         speeds[agent.pos[1]].append(agent.speed)
-    return [np.average(x)*3.6*model.gridsize for x in speeds]
+    return [np.average(x)*3.6 for x in speeds]
 
 
 def cars_in_lane(model):

@@ -8,7 +8,6 @@ from mesa import Model
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 # from mesa.space import SingleGrid
-from space import SingleGrid
 import cargrid as car
 from lane_grid import LaneSpace
 from data_collection import avg_speed, lane_speeds, cars_in_lane
