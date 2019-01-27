@@ -23,16 +23,16 @@ class RoadSim(Model):
     # pylint: disable=too-many-arguments
 
     def __init__(self, lanes=3, length=5000, spawn=0.4,
-                 speed=100, sim_time=1000, init_time=100):
+                 speed=100, time_step=0.1, init_time=0):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn
         self.length = int(length)
         self.init_time = init_time
-        self.sim_time = sim_time
+        self.time_step = time_step
 
-        self.grid = LaneSpace(self.length, self.lanes)
+        self.grid = LaneSpace(self.length, self.lanes, self.time_step)
 
         self.schedule = RandomActivation(self)
         self.speed = speed/3.6
@@ -48,12 +48,13 @@ class RoadSim(Model):
                 },
             agent_reporters={},
             tables={'Positions': ['x', 'y']})
-        self.__init_sim()
+        if init_time:
+            self.__init_sim()
         print('Starting run')
 
     def __init_sim(self):
         print('Initializing model')
-        for _ in tqdm(range(self.init_time)):
+        for _ in range(self.init_time):
             self.schedule.step()
             self.init_cars()
 
@@ -70,7 +71,7 @@ class RoadSim(Model):
         """
         free_lanes = self.get_free_lanes()
         for i in range(self.lanes):
-            if free_lanes[i] and random.random() < self.spawn_chance:
+            if free_lanes[i] and np.random.rand() < (self.spawn_chance*self.time_step):
                 self.new_car(i)
 
     def new_car(self, start_lane=0):
