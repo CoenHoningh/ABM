@@ -28,7 +28,7 @@ class LaneSpace:
             indexed following the same rules as the positions array.
     """
 
-    def __init__(self, length, lanes, scale=1):
+    def __init__(self, length, lanes, time_step=1, scale=1):
         """
         Initialize the highway space.
 
@@ -41,6 +41,7 @@ class LaneSpace:
         """
         self.length = int(length*scale)
         self.lanes = lanes
+        self.time_step = time_step
         print(f"Using {self.length*self.lanes*16/1000000}MB of memory")
         self.positions = np.full((self.lanes, self.length), np.nan)
         self.speeds = np.full((self.lanes, self.length), np.nan)
@@ -77,7 +78,7 @@ class LaneSpace:
         loc, lane = agent.pos
         if loc+agent.speed > self.length:
             return False
-        new_loc = loc + agent.speed
+        new_loc = loc + (agent.speed * self.time_step)
         new_lane = lane + lane_switch
         if lane_switch:
             self.positions[lane, agent.index] = np.nan
@@ -115,8 +116,8 @@ class LaneSpace:
             backs: A (3,2) list which has the postition and speed of the
                 cars behind.
         """
-        fronts = [(-1, -1) for x in range(3)]
-        backs = [(-1, -1) for x in range(3)]
+        fronts = [(self.length*2, 999) for x in range(3)]
+        backs = [(0, 0) for x in range(3)]
         for i in range(0, 3):
             j = agent.pos[1]-1+i
             if 0 <= j < self.lanes:
