@@ -129,7 +129,7 @@ class LaneSpace:
                     fronts[i] = (f_pos[f], f_speed[f])
                 if np.shape(b_ind)[1]:
                     b_pos = self.positions[j][b_ind]
-                    b_speed = self.speeds[j][f_ind]
+                    b_speed = self.speeds[j][b_ind]
                     b = np.argmax(b_pos)
                     backs[i] = (b_pos[b], b_speed[b])
         return fronts, backs
