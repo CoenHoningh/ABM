@@ -1,9 +1,9 @@
 from tqdm import tqdm
 from modelgrid import RoadSim
 
-tot_time = 5000
-yo = RoadSim(lanes=3, length=5000, spawn=0.6, speed=100,
-             sim_time=tot_time, init_time=500)
+tot_time = 20000
+yo = RoadSim(lanes=3, length=5000, spawn=0.8, speed=100,
+             time_step=0.1, init_time=5000)
 for a in tqdm(range(tot_time)):
     yo.step()
 yo.get_positions()

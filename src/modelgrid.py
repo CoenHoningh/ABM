@@ -1,7 +1,6 @@
 """ Module for the model instance.
 Creates the general road model in which the car agents reside.
 """
-import random
 import numpy as np
 from tqdm import tqdm
 from mesa import Model
@@ -22,8 +21,8 @@ class RoadSim(Model):
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
 
-    def __init__(self, lanes=3, length=5000, spawn=0.4,
-                 speed=100, time_step=0.1, init_time=0):
+    def __init__(self, lanes=3, length=5000, spawn=0.4, agression=0.1,
+                 speed=100, time_step=0.1, init_time=0, min_gap=1.0):
         super().__init__()
         self.current_id = 0
         self.lanes = lanes
@@ -31,6 +30,8 @@ class RoadSim(Model):
         self.length = int(length)
         self.init_time = init_time
         self.time_step = time_step
+        self.agression = 1 - agression
+        self.min_gap = min_gap
 
         self.grid = LaneSpace(self.length, self.lanes, self.time_step)
 
@@ -54,7 +55,7 @@ class RoadSim(Model):
 
     def __init_sim(self):
         print('Initializing model')
-        for _ in range(self.init_time):
+        for _ in tqdm(range(self.init_time)):
             self.schedule.step()
             self.init_cars()
 
@@ -62,7 +63,7 @@ class RoadSim(Model):
         """
         Returns a bool arary of the availability of each lane.
         """
-        return np.count_nonzero(self.grid.positions < self.speed, axis=1) == 0
+        return np.count_nonzero(self.grid.positions < self.speed*self.time_step, axis=1) == 0
 
     def init_cars(self):
         """
@@ -71,15 +72,16 @@ class RoadSim(Model):
         """
         free_lanes = self.get_free_lanes()
         for i in range(self.lanes):
-            if free_lanes[i] and np.random.rand() < (self.spawn_chance*self.time_step):
+            if free_lanes[i] and np.random.rand()\
+             < (self.spawn_chance*self.time_step):
                 self.new_car(i)
 
     def new_car(self, start_lane=0):
         """
         Generates a new car object and adds it to the model scheduler.
         """
-        new_car = car.Car(self.next_id(), self,
-                          start_lane=start_lane, speed=self.speed)
+        new_car = car.Car(self.next_id(), self, start_lane, self.speed,
+                          self.agression, self.min_gap)
 
         self.grid.place_agent(new_car)
         self.cars.append(new_car)
@@ -108,7 +110,8 @@ class RoadSim(Model):
         print('saving')
         for agent in self.cars:
             self.datacollector.add_table_row('Positions',
-                                             {'x': agent.pos[0], 'y': agent.pos[1]})
+                                             {'x': agent.pos[0],
+                                              'y': agent.pos[1]})
         print('done')
 
     # def stats(self):

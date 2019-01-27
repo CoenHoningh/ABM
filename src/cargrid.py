@@ -1,25 +1,26 @@
 """ Module which defines the car agents
 """
-import random
 from mesa import Agent
 import numpy as np
-from scipy.stats import truncnorm, norm
 
 
 class Car(Agent):
     """
     Defines the properties and behaviour of each car agent.
     """
-    def __init__(self, unique_id, model, start_lane, speed):
+    def __init__(self, unique_id, model, start_lane, speed, agression, min_gap):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
         self.index = self.unique_id % model.length
         # self.loc = 0.0
         # self.lane = start_lane
         self.pos = (0.0, start_lane)
-        self.max_speed = speed+(np.random.rand()*5)
+        self.max_speed = speed+(np.random.rand()/agression)
         self.speed = self.max_speed
-        self.gap = np.random.rand()*2 + 1
+        self.agression = agression
+        self.gap = np.random.rand()*2*agression + min_gap
+        self.switch_delay = int(15/self.model.time_step)
+        self.switched = self.switch_delay
 
     # def compute_pars(self, FRONT, BACK):
 
@@ -84,6 +85,8 @@ class Car(Agent):
             view: how many places to look ahead
             lane: which lane to check: -1 = right, 0 = same, 1 = left
         '''
+        self.switched -= 1
+        self.switched = max(0, self.switched)
         FRONT, BACK = self.model.grid.get_neighbors(self)
         # print(FRONT, BACK)
         # print(self.pos, self.speed)
@@ -92,23 +95,30 @@ class Car(Agent):
             # gaps, times, min_r, min_l = self.compute_pars(FRONT, BACK)
             rf, mf, lf = FRONT
             rb, mb, lb = BACK
+            can_left = lf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-lb[0]> 0.5*self.speed and self.pos[1] < (self.model.lanes - 1) and self.switched == 0
+            can_right = rf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-rb[0]> 0.5*self.speed and self.pos[1] > 0 and self.switched == 0
             if mf[0]-self.pos[0] > self.gap*self.speed:
+                if can_right and np.random.rand() < self.agression:
+                    self.switched = self.switch_delay
+                    return -1
                 if self.speed < self.max_speed:
                     self.check_speed(mf[0]-self.pos[0])
                 return 0
-            can_left = lf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-lb[0]> 0.5*self.speed and self.pos[1] < (self.model.lanes - 1)
-            can_right = rf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-rb[0]> 0.5*self.speed and self.pos[1] > 0
             if can_left and can_right:
                 if rf[0] < lf[0]:
+                    self.switched = self.switch_delay
                     return 1
                 if self.speed < 10:
+                    self.switched = self.switch_delay
                     return -1
                 return 1
             if can_left:
+                self.switched = self.switch_delay
                 return 1
-            if can_right:
+            if can_right and (np.random.rand() > self.agression or self.speed < 10):
+                self.switched = self.switch_delay
                 return -1
-            self.speed -= np.random.rand()*self.gap*self.model.time_step
+            self.speed -= np.random.rand()*self.gap*self.model.time_step/self.agression
             # print('-----')
             # print(self.pos[1])
             # print('middle')
@@ -140,8 +150,8 @@ class Car(Agent):
         Check if the car has recently braked and otherwise can speed up.
         """
         diff = self.max_speed - self.speed
-        space = (gap-self.speed)/self.speed/self.gap
-        speedup = max(np.random.rand(), np.log(diff*space))*self.model.time_step
+        space = (gap-self.speed)/self.speed/self.gap/self.agression
+        speedup = max(np.random.rand()/self.agression, np.log(diff*space))*self.model.time_step
         self.speed += speedup
 
     def step(self):
@@ -207,7 +217,7 @@ class Car(Agent):
         move = self.get_move()
         self.model.move(self, move)
         if self.speed > self.max_speed:
-            self.speed -= np.random.rand()*self.gap*self.model.time_step
+            self.speed -= np.random.rand()*self.gap*self.model.time_step*self.agression
 
         # if self.is_slowed():
         #     self.check_speed()
