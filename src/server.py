@@ -13,12 +13,12 @@ COLORS = {-1: "pink",
           1: "#ccff33",
           2: "yellow",
           3: "orange",
-          4: "#cc6600",
-          5: "red",
-          6: "red",
+          4: "orange",
+          5: "#cc6600",
+          6: "#cc6600",
           7: "red",
           8: "red",
-          9: "red"}
+          9: "#420d09"}
 
 
 def agent_portrayal(agent):
@@ -33,7 +33,7 @@ def agent_portrayal(agent):
 
 
 number_of_lanes = 3
-length = 1000
+length = 5000
 
 
 grid = SimpleCanvas(agent_portrayal, 300, 1000)
@@ -55,6 +55,14 @@ server = ModularServer(RoadSim,
                             UserSettableParameter('slider',
                                                   "Spawn Chance",
                                                   0.5, 0.0, 1.0, 0.05),
+                        "agression":
+                            UserSettableParameter('slider',
+                                                  "Driver Agression",
+                                                  0.1, 0.0, 1.0, 0.05),
+                        "min_gap":
+                            UserSettableParameter('slider',
+                                                  "Smallest gap",
+                                                  1.0, 0.5, 5.0, 0.1),
                         "speed":
                             UserSettableParameter('slider',
                                                   'Maximum speed',

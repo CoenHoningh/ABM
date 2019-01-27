@@ -29,7 +29,6 @@ class SimpleCanvas(VisualizationElement):
             y = (y+1) / (model.grid.lanes+1) /3
             portrayal["x"] = x
             portrayal["y"] = y
-            print(portrayal)
             space_state.append(portrayal)
         return space_state
 
