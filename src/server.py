@@ -33,7 +33,7 @@ def agent_portrayal(agent):
 
 
 number_of_lanes = 3
-length = 500
+length = 1000
 
 
 grid = SimpleCanvas(agent_portrayal, 300, 1000)

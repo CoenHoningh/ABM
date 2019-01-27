@@ -108,7 +108,7 @@ class Car(Agent):
                 return 1
             if can_right:
                 return -1
-            self.speed -= np.random.rand()*self.gap
+            self.speed -= np.random.rand()*self.gap*self.model.time_step
             # print('-----')
             # print(self.pos[1])
             # print('middle')
@@ -139,13 +139,9 @@ class Car(Agent):
         """
         Check if the car has recently braked and otherwise can speed up.
         """
-        diff = int(self.max_speed - self.speed)
-        if diff < 2:
-            speedup = np.random.rand()*2
-        else:
-            speedup = min(np.random.randint(0, diff), 10)
-        while speedup > 0 and (gap-speedup) < self.speed:
-            speedup -= np.random.rand()
+        diff = self.max_speed - self.speed
+        space = (gap-self.speed)/self.speed/self.gap
+        speedup = max(np.random.rand(), np.log(diff*space))*self.model.time_step
         self.speed += speedup
 
     def step(self):
@@ -211,7 +207,7 @@ class Car(Agent):
         move = self.get_move()
         self.model.move(self, move)
         if self.speed > self.max_speed:
-            self.speed -= np.random.rand()*self.gap
+            self.speed -= np.random.rand()*self.gap*self.model.time_step
 
         # if self.is_slowed():
         #     self.check_speed()

@@ -23,7 +23,8 @@ class SimpleCanvas(VisualizationElement):
         for obj in model.schedule.agents:
             portrayal = self.portrayal_method(obj)
             x, y = obj.pos
-            x = x / model.grid.length * 3
+            y = model.grid.lanes-1-y
+            x = x / model.grid.length * 3.5
             #y = (y+1) / (model.grid.lanes+1)
             y = (y+1) / (model.grid.lanes+1) /3
             portrayal["x"] = x
