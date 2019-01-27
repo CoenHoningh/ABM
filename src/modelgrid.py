@@ -1,15 +1,15 @@
 """ Module for the model instance.
 Creates the general road model in which the car agents reside.
 """
+import itertools
 import numpy as np
-from tqdm import tqdm
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 # from mesa.space import SingleGrid
 import cargrid as car
 from lane_grid import LaneSpace
-from data_collection import avg_speed, lane_speeds, cars_in_lane
+from data_collection import avg_speed, cars_in_lane, track_params, track_run
 
 
 class RoadSim(Model):
@@ -17,6 +17,7 @@ class RoadSim(Model):
     """ Hosts the road model and the mesa grid.
     Contains methods to generate new car agents and collect data.
     """
+    id_gen = itertools.count(1)
 
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
@@ -24,6 +25,7 @@ class RoadSim(Model):
     def __init__(self, lanes=3, length=5000, spawn=0.4, agression=0.1,
                  speed=100, time_step=0.1, init_time=0, min_gap=1.0):
         super().__init__()
+        self.uid = next(self.id_gen)
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn
@@ -44,18 +46,18 @@ class RoadSim(Model):
         self.datacollector = DataCollector(
             model_reporters={
                 "Avg_speed": avg_speed,
-                'Lane_speeds': lane_speeds,
-                'Cars_in_lane': cars_in_lane
-                },
-            agent_reporters={},
-            tables={'Positions': ['x', 'y']})
+                'Cars_in_lane': cars_in_lane,
+                'Model Params': track_params,
+                'Run': track_run}
+            )
+
         if init_time:
             self.__init_sim()
         print('Starting run')
 
     def __init_sim(self):
         print('Initializing model')
-        for _ in tqdm(range(self.init_time)):
+        for _ in range(self.init_time):
             self.schedule.step()
             self.init_cars()
 

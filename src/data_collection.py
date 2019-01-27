@@ -24,3 +24,9 @@ def lane_speeds(model):
 
 def cars_in_lane(model):
     return len(model.schedule.agents)
+
+def track_params(model):
+    return (model.spawn_chance, model.agression, model.min_gap)
+
+def track_run(model):
+    return model.uid
