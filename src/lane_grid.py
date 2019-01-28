@@ -42,7 +42,6 @@ class LaneSpace:
         self.length = int(length*scale)
         self.lanes = lanes
         self.time_step = time_step
-        print(f"Using {self.length*self.lanes*16/1000000}MB of memory")
         self.positions = np.full((self.lanes, self.length), np.nan)
         self.speeds = np.full((self.lanes, self.length), np.nan)
 

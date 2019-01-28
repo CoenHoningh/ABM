@@ -53,10 +53,8 @@ class RoadSim(Model):
 
         if init_time:
             self.__init_sim()
-        print('Starting run')
 
     def __init_sim(self):
-        print('Initializing model')
         for _ in range(self.init_time):
             self.schedule.step()
             self.init_cars()
