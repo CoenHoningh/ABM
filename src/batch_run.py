@@ -12,14 +12,14 @@ fixed_params = {"lanes": 3,
                 "length": 5000,
                 "speed": 100,
                 "time_step": 0.1,
-                "init_time": 1000}
+                "init_time": 0}
 
 br = BatchRunnerMP(RoadSim,
                    nr_processes=8,
                    variable_parameters=br_params,
                    fixed_parameters=fixed_params,
                    iterations=1,
-                   max_steps=5000,
+                   max_steps=10000,
                    model_reporters={"Data Collector":
                                     lambda m: m.datacollector})
 

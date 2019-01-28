@@ -1,7 +1,7 @@
 """ Module for the model instance.
 Creates the general road model in which the car agents reside.
 """
-import itertools
+import hashlib
 import numpy as np
 from mesa import Model
 from mesa.time import RandomActivation
@@ -17,7 +17,6 @@ class RoadSim(Model):
     """ Hosts the road model and the mesa grid.
     Contains methods to generate new car agents and collect data.
     """
-    id_gen = itertools.count(1)
 
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
@@ -25,7 +24,7 @@ class RoadSim(Model):
     def __init__(self, lanes=3, length=5000, spawn=0.4, agression=0.1,
                  speed=100, time_step=0.1, init_time=0, min_gap=1.0):
         super().__init__()
-        self.uid = next(self.id_gen)
+        self.uid = hash((spawn, agression, min_gap))
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn
