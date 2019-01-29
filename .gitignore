@@ -5,3 +5,7 @@ Pipfile
 Pipfile.lock
 */posities.csv
 */snelheden.csv
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+*/*/.ipynb_checkpoints/
+*/*/*/.ipynb_checkpoints/
