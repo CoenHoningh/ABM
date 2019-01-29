@@ -1,4 +1,4 @@
-var LaneVisualization = function(height, width, context) {
+var LaneVisualization = function(width, height, context) {
 	var height = height;
 	var width = width;
 	var context = context;
@@ -20,7 +20,7 @@ var LaneVisualization = function(height, width, context) {
 		var r = radius;
 
 		context.beginPath();
-		context.arc(cx, cy, r, 0, Math.PI * 2, false);
+		context.arc(cx, cy, r, 0, Math.PI * 2);
 		context.closePath();
 
 		context.strokeStyle = color;
@@ -51,18 +51,19 @@ var LaneVisualization = function(height, width, context) {
 	};
 
 	this.resetCanvas = function() {
-		context.clearRect(0, 0, height, width);
+		context.clearRect(0, 0, width, height);
 		context.beginPath();
 	};
 };
 
 var Lane_Module = function(canvas_width, canvas_height) {
-	// Create the element
-	// ------------------
+
+	var canvas_width = canvas_width;
+	var canvas_height = canvas_height;
 
 	// Create the tag:
 	var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
-	canvas_tag += "style='border:1px dotted'></canvas>";
+	canvas_tag += "style='border:2px dotted'></canvas>";
 	// Append it to body:
 	var canvas = $(canvas_tag)[0];
 	$("#elements").append(canvas);
@@ -81,4 +82,3 @@ var Lane_Module = function(canvas_width, canvas_height) {
 	};
 
 };
-

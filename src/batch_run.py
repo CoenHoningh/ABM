@@ -4,13 +4,13 @@ import pandas as pd
 from modelgrid import RoadSim
 
 
-br_params = {"spawn": [x/10 for x in range(1, 10)],
-             "agression": [x/10 for x in range(1, 10)],
-             "min_gap": [x/2 for x in range(1, 10)]}
+br_params = {"length": [1000, 5000, 10000, 15000, 20000]}
 
 fixed_params = {"lanes": 3,
-                "length": 5000,
+                "spawn": 0.5,
+                "agression": 0.5,
                 "speed": 100,
+                "min_gap": 1.0,
                 "time_step": 0.1,
                 "init_time": 0}
 
@@ -19,7 +19,7 @@ br = BatchRunnerMP(RoadSim,
                    variable_parameters=br_params,
                    fixed_parameters=fixed_params,
                    iterations=1,
-                   max_steps=10000,
+                   max_steps=50000,
                    model_reporters={"Data Collector":
                                     lambda m: m.datacollector})
 

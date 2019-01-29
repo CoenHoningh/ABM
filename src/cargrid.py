@@ -11,7 +11,7 @@ class Car(Agent):
     def __init__(self, unique_id, model, start_lane, speed, agression, min_gap):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
-        self.index = self.unique_id % model.length
+        self.index = self.unique_id % model.grid.length
         # self.loc = 0.0
         # self.lane = start_lane
         self.pos = (0.0, start_lane)
@@ -90,7 +90,7 @@ class Car(Agent):
         FRONT, BACK = self.model.grid.get_neighbors(self)
         rf, mf, lf = FRONT
         rb, mb, lb = BACK
-        self.match_speed(mf)
+        #self.match_speed(mf)
         # print(FRONT, BACK)
         # print(self.pos, self.speed)
         # print('-------')
@@ -101,27 +101,27 @@ class Car(Agent):
             if mf[0]-self.pos[0] > self.gap*self.speed:
                 if can_right and np.random.rand() < self.agression:
                     self.switched = self.switch_delay
-                    self.match_speed(rf)
+                    #self.match_speed(rf)
                     return -1
                 if self.speed < self.max_speed:
                     self.check_speed(mf[0]-self.pos[0])
                 return 0
             if can_left and can_right:
                 if rf[0] < lf[0]:
-                    self.match_speed(lf)
+                    #self.match_speed(lf)
                     self.switched = self.switch_delay
                     return 1
                 if self.speed < 10:
-                    self.match_speed(rf)
+                    #self.match_speed(rf)
                     self.switched = self.switch_delay
                     return -1
                 return 1
             if can_left:
-                self.match_speed(lf)
+                #self.match_speed(lf)
                 self.switched = self.switch_delay
                 return 1
             if can_right and (np.random.rand() > self.agression or self.speed < 10):
-                self.match_speed(rf)
+                #self.match_speed(rf)
                 self.switched = self.switch_delay
                 return -1
             self.speed -= np.random.rand()*self.model.time_step/self.agression

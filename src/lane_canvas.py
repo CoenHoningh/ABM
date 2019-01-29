@@ -2,12 +2,12 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class SimpleCanvas(VisualizationElement):
-    local_includes = ["lane_canvas.js"]
+    local_includes = ["./lane_canvas.js"]
     portrayal_method = None
     canvas_height = 300
     canvas_width = 5000
 
-    def __init__(self, portrayal_method, canvas_height=500, canvas_width=500):
+    def __init__(self, portrayal_method, canvas_width=5000, canvas_height=300):
         '''
         Instantiate a new SimpleCanvas
         '''
@@ -24,9 +24,9 @@ class SimpleCanvas(VisualizationElement):
             portrayal = self.portrayal_method(obj)
             x, y = obj.pos
             y = model.grid.lanes-1-y
-            x = x / model.grid.length * 3.5
-            #y = (y+1) / (model.grid.lanes+1)
-            y = (y+1) / (model.grid.lanes+1) /3
+            x = x / model.grid.length
+            # y = (y+1) / (model.grid.lanes+1)
+            y = (y+1) / (model.grid.lanes+1)
             portrayal["x"] = x
             portrayal["y"] = y
             space_state.append(portrayal)

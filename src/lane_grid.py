@@ -55,9 +55,14 @@ class LaneSpace:
                 modulo length respectively
         """
         loc, lane = agent.pos
-        self.positions[lane, agent.index] = loc
-        self.speeds[lane, agent.index] = agent.speed
-        agent.pos = (loc, lane)
+        if np.isnan(self.positions[lane, agent.index]):
+            self.positions[lane, agent.index] = loc
+            self.speeds[lane, agent.index] = agent.speed
+            agent.pos = (loc, lane)
+            return
+        print('agent index not empty')
+        print(len(agent.model.cars))
+        raise IndexError
 
     def move_agent(self, agent, lane_switch):
         """
@@ -75,7 +80,7 @@ class LaneSpace:
             True: if the move was succesfull.
         """
         loc, lane = agent.pos
-        if loc+agent.speed > self.length:
+        if loc+agent.speed > agent.model.length:
             return False
         new_loc = loc + (agent.speed * self.time_step)
         new_lane = lane + lane_switch

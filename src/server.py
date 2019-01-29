@@ -26,7 +26,7 @@ def agent_portrayal(agent):
     Properties of the agent visualization.
     """
     portrayal = {"Shape": "circle",
-                 "Color": COLORS[min((agent.max_speed-agent.speed)//2, 9)],
+                 "Color": f"rgb({150-(agent.speed*3.6)},{50+(agent.speed*3.6)},0)",
                  "Filled": "true",
                  "r": 6}
     return portrayal
@@ -36,7 +36,7 @@ number_of_lanes = 3
 length = 5000
 
 
-grid = SimpleCanvas(agent_portrayal, 300, 1000)
+grid = SimpleCanvas(agent_portrayal, 5000, 300)
 
 
 # Create a dynamic linegraph
