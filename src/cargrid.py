@@ -19,7 +19,7 @@ class Car(Agent):
         self.speed = self.max_speed
         self.agression = agression
         self.gap = np.random.rand()*2*agression + min_gap
-        self.switch_delay = int(15/self.model.time_step)
+        self.switch_delay = int(30/self.model.time_step)
         self.switched = self.switch_delay
 
     # def compute_pars(self, FRONT, BACK):
@@ -88,37 +88,43 @@ class Car(Agent):
         self.switched -= 1
         self.switched = max(0, self.switched)
         FRONT, BACK = self.model.grid.get_neighbors(self)
+        rf, mf, lf = FRONT
+        rb, mb, lb = BACK
+        self.match_speed(mf)
         # print(FRONT, BACK)
         # print(self.pos, self.speed)
         # print('-------')
         while True:
             # gaps, times, min_r, min_l = self.compute_pars(FRONT, BACK)
-            rf, mf, lf = FRONT
-            rb, mb, lb = BACK
-            can_left = lf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-lb[0]> 0.5*self.speed and self.pos[1] < (self.model.lanes - 1) and self.switched == 0
-            can_right = rf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-rb[0]> 0.5*self.speed and self.pos[1] > 0 and self.switched == 0
+            can_left = lf[0]-self.pos[0] > self.gap*self.speed*self.agression and self.pos[0]-lb[0]> 0.5*self.speed*self.agression and self.pos[1] < (self.model.lanes - 1) and self.switched == 0
+            can_right = rf[0]-self.pos[0] > self.gap*self.speed*self.agression and self.pos[0]-rb[0]> 0.5*self.speed*self.agression and self.pos[1] > 0 and self.switched == 0
             if mf[0]-self.pos[0] > self.gap*self.speed:
                 if can_right and np.random.rand() < self.agression:
                     self.switched = self.switch_delay
+                    self.match_speed(rf)
                     return -1
                 if self.speed < self.max_speed:
                     self.check_speed(mf[0]-self.pos[0])
                 return 0
             if can_left and can_right:
                 if rf[0] < lf[0]:
+                    self.match_speed(lf)
                     self.switched = self.switch_delay
                     return 1
                 if self.speed < 10:
+                    self.match_speed(rf)
                     self.switched = self.switch_delay
                     return -1
                 return 1
             if can_left:
+                self.match_speed(lf)
                 self.switched = self.switch_delay
                 return 1
             if can_right and (np.random.rand() > self.agression or self.speed < 10):
+                self.match_speed(rf)
                 self.switched = self.switch_delay
                 return -1
-            self.speed -= np.random.rand()*self.gap*self.model.time_step/self.agression
+            self.speed -= np.random.rand()*self.model.time_step/self.agression
             # print('-----')
             # print(self.pos[1])
             # print('middle')
@@ -139,11 +145,16 @@ class Car(Agent):
         #         return False
         # return True
 
-    def is_slowed(self):
+    def match_speed(self, front_car):
         """
         Check if the agent is below their maximum speed
         """
-        return self.speed < self.max_speed
+        f_pos, f_speed = front_car
+        speed_diff = f_speed - self.speed
+        if abs(speed_diff) > 0.8*self.max_speed:
+            return
+        gap = (f_pos - self.pos[0])/10
+        self.speed += speed_diff*self.model.time_step/gap
 
     def check_speed(self, gap):
         """
@@ -217,7 +228,7 @@ class Car(Agent):
         move = self.get_move()
         self.model.move(self, move)
         if self.speed > self.max_speed:
-            self.speed -= np.random.rand()*self.gap*self.model.time_step*self.agression
+            self.speed -= np.random.rand()*self.model.time_step
 
         # if self.is_slowed():
         #     self.check_speed()
