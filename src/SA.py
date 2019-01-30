@@ -20,8 +20,8 @@ problem = {
 }
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-replicates = 2 #10
-max_steps = 100
+replicates = 10
+max_steps = 1000
 distinct_samples = 10
 
 # We get all our samples here
@@ -33,7 +33,9 @@ model_reporters={
                 'Final_Cars_in_lane': cars_in_lane,
                 "Data Collector": lambda m: m.datacollector,
                 'Total_Avg_speed': avg_speed,
-                'Total_Cars_in_lane': cars_in_lane
+                'Total_Cars_in_lane': cars_in_lane,
+                'Variance_speed': avg_speed,
+                'Variance_car': cars_in_lane
                 }
 
 # READ NOTE BELOW CODE
@@ -61,17 +63,22 @@ for i in tqdm(range(replicates)):
         # clear_output()
         # print(f'{count / (len(param_values) * (replicates)) * 100:.2f}% done')
 
-data = batch.get_model_vars_dataframe()
+data_original = batch.get_model_vars_dataframe()
+data = data_original.copy()
 print(data.shape)
 
-for i in range(len(data["Data Collector"])):
+for i in tqdm(range(len(data["Data Collector"]))):
     if isinstance(data["Data Collector"][i], DataCollector):
         data_speed = data["Data Collector"][i].get_model_vars_dataframe()['Avg_speed']
         data_cars = data["Data Collector"][i].get_model_vars_dataframe()['Cars_in_lane']
         # print(data_speed)
         # print(np.average(data_speed))
-        data['Total_Avg_speed'][i] = np.average(data_speed)
-        data['Total_Cars_in_lane'][i] = np.average(data_cars)
+        tenproc = int(0.2 * (len(data_speed)))
+        # print(tenproc)
+        data['Total_Avg_speed'][i] = np.average(data_speed[tenproc:])
+        data['Total_Cars_in_lane'][i] = np.average(data_cars[tenproc:])
+        data['Variance_speed'][i] = np.var(data_speed[tenproc:])
+        data['Variance_car'][i] = np.var(data_cars[tenproc:])
 
 
 data.to_csv('Sobol_result.csv', sep=',', index=False)
