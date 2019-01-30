@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class SimpleCanvas(VisualizationElement):
-    local_includes = ["./lane_canvas.js"]
+    local_includes = ["yoyo.js"]
     portrayal_method = None
     canvas_height = 300
     canvas_width = 5000
