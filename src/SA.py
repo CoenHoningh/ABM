@@ -4,8 +4,13 @@ from mesa.batchrunner import BatchRunner
 from modelgrid import *
 from IPython.display import clear_output
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+from itertools import combinations
+import seaborn as sns
+from matplotlib import rcParams
 
-
+sns.set()
+rcParams.update({'figure.autolayout': True})
 
 # We define our variables and bounds
 problem = {
@@ -15,7 +20,7 @@ problem = {
 }
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-replicates = 2 #10
+replicates = 10 #10
 max_steps = 100
 distinct_samples = 10
 
@@ -53,7 +58,66 @@ for i in tqdm(range(replicates)):
         # print(f'{count / (len(param_values) * (replicates)) * 100:.2f}% done')
 
 data = batch.get_model_vars_dataframe()
+print(data.shape)
 
-data.to_csv('Sobol_result.csv', sep='\t', index=False)
+
+data.to_csv('Sobol_result.csv', sep=',', index=False)
 
 print(data)
+
+Si_Speed = sobol.analyze(problem, data['Avg_speed'].as_matrix(), print_to_console=False)
+print("\n")
+Si_Cars = sobol.analyze(problem, data['Cars_in_lane'].as_matrix(), print_to_console=False)
+
+
+def plot_index(s, params, i, title=''):
+    """
+    Creates a plot for Sobol sensitivity analysis that shows the contributions
+    of each parameter to the global sensitivity.
+
+    Args:
+        s (dict): dictionary {'S#': dict, 'S#_conf': dict} of dicts that hold
+            the values for a set of parameters
+        params (list): the parameters taken from s
+        i (str): string that indicates what order the sensitivity is.
+        title (str): title for the plot
+    """
+
+    if i == '2':
+        p = len(params)
+        params = list(combinations(params, 2))
+        indices = s['S' + i].reshape((p ** 2))
+        indices = indices[~np.isnan(indices)]
+        errors = s['S' + i + '_conf'].reshape((p ** 2))
+        errors = errors[~np.isnan(errors)]
+    else:
+        indices = s['S' + i]
+        errors = s['S' + i + '_conf']
+        plt.figure()
+
+    l = len(indices)
+
+    plt.title(title)
+    plt.ylim([-0.2, len(indices) - 1 + 0.2])
+    plt.yticks(range(l), params)
+    plt.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o')
+    plt.axvline(0, c='k')
+    fig = plt.gcf()
+    fig.set_size_inches(8, 5)
+
+typename = ["Average_speed", "Number_of_cars"]
+for i, Si in enumerate((Si_Speed, Si_Cars)):
+    # First order
+    plot_index(Si, problem['names'], '1', 'First order sensitivity  -  ' + typename[i])
+    plt.savefig('plots/First_order_sensitivity_|_' + typename[i] + '.png')
+    plt.clf()
+
+    # Second order
+    plot_index(Si, problem['names'], '2', 'Second order sensitivity  -  ' + typename[i])
+    plt.savefig('plots/Second_order_sensitivity_|_' + typename[i] + '.png')
+    plt.clf()
+
+    # Total order
+    plot_index(Si, problem['names'], 'T', 'Total order sensitivity  -  ' + typename[i])
+    plt.savefig('plots/Total_order_sensitivity_|_' + typename[i] + '.png')
+    plt.clf()
