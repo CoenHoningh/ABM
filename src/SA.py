@@ -40,7 +40,7 @@ batch = BatchRunner(RoadSim,
 
 count = 0
 for i in tqdm(range(replicates)):
-    for vals in param_values:
+    for vals in tqdm(param_values):
         # Change parameters that should be integers
         vals = list(vals)
         # vals[0] = int(vals[0])
