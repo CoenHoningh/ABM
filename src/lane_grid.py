@@ -43,7 +43,7 @@ class LaneSpace:
         self.lanes = lanes
         self.time_step = time_step
         self.positions = np.full((self.lanes, self.length), np.nan)
-        self.speeds = np.full((self.lanes, self.length), np.nan)
+        # self.speeds = np.full((self.lanes, self.length), np.nan)
 
     def place_agent(self, agent):
         """
@@ -55,9 +55,15 @@ class LaneSpace:
                 modulo length respectively
         """
         loc, lane = agent.pos
-        self.positions[lane, agent.index] = loc
-        self.speeds[lane, agent.index] = agent.speed
-        agent.pos = (loc, lane)
+        if np.isnan(self.positions[lane, agent.index]):
+            self.positions[lane, agent.index] = loc
+            # self.speeds[lane, agent.index] = agent.speed
+            agent.pos = (loc, lane)
+            return
+        print('agent index not empty')
+        print('Consider increasing the scale of the model')
+        print(len(agent.model.cars))
+        raise IndexError
 
     def move_agent(self, agent, lane_switch):
         """
@@ -75,15 +81,15 @@ class LaneSpace:
             True: if the move was succesfull.
         """
         loc, lane = agent.pos
-        if loc+agent.speed > self.length:
+        if loc+agent.speed > agent.model.length:
             return False
         new_loc = loc + (agent.speed * self.time_step)
         new_lane = lane + lane_switch
         if lane_switch:
             self.positions[lane, agent.index] = np.nan
-            self.speeds[lane, agent.index] = np.nan
+            # self.speeds[lane, agent.index] = np.nan
         self.positions[new_lane, agent.index] = new_loc
-        self.speeds[new_lane, agent.index] = agent.speed
+        # self.speeds[new_lane, agent.index] = agent.speed
         agent.pos = (new_loc, new_lane)
         return True
 
@@ -96,7 +102,7 @@ class LaneSpace:
         """
         lane = agent.pos[1]
         self.positions[lane, agent.index] = np.nan
-        self.speeds[lane, agent.index] = np.nan
+        # self.speeds[lane, agent.index] = np.nan
 
     def get_neighbors(self, agent):
         """
@@ -115,21 +121,15 @@ class LaneSpace:
             backs: A (3,2) list which has the postition and speed of the
                 cars behind.
         """
-        fronts = [(self.length*2, 999) for x in range(3)]
-        backs = [(0, 0) for x in range(3)]
+        fronts = [agent.model.length*2, agent.model.length*2, agent.model.length*2]
+        backs = [-100, -100, -100]
         for i in range(0, 3):
             j = agent.pos[1]-1+i
             if 0 <= j < self.lanes:
-                f_ind = np.nonzero(agent.pos[0] < self.positions[j])
-                b_ind = np.nonzero(agent.pos[0] > self.positions[j])
-                if np.shape(f_ind)[1]:
-                    f_pos = self.positions[j][f_ind]
-                    f_speed = self.speeds[j][f_ind]
-                    f = np.argmin(f_pos)
-                    fronts[i] = (f_pos[f], f_speed[f])
-                if np.shape(b_ind)[1]:
-                    b_pos = self.positions[j][b_ind]
-                    b_speed = self.speeds[j][b_ind]
-                    b = np.argmax(b_pos)
-                    backs[i] = (b_pos[b], b_speed[b])
+                f_ind = self.positions[j][(agent.pos[0] < self.positions[j]).nonzero()]
+                b_ind = self.positions[j][(agent.pos[0] > self.positions[j]).nonzero()]
+                if len(f_ind):
+                    fronts[i] = np.minimum.reduce(f_ind)
+                if len(b_ind):
+                    backs[i] = np.maximum.reduce(b_ind)
         return fronts, backs

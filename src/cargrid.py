@@ -11,73 +11,34 @@ class Car(Agent):
     def __init__(self, unique_id, model, start_lane, speed, agression, min_gap):
         super().__init__(unique_id, model)
         self.start_lane = start_lane
-        self.index = self.unique_id % model.length
+        self.index = self.unique_id % model.grid.length
         # self.loc = 0.0
         # self.lane = start_lane
         self.pos = (0.0, start_lane)
-        self.max_speed = speed+(np.random.rand()/agression)
+        self.max_speed = speed+(abs(np.random.randn())*agression)
         self.speed = self.max_speed
         self.agression = agression
-        self.gap = np.random.rand()*2*agression + min_gap
-        self.switch_delay = int(15/self.model.time_step)
+        self.gap = np.random.rand() / agression + min_gap
+        self.switch_delay = int(5 / agression / self.model.time_step)
         self.switched = self.switch_delay
 
-    # def compute_pars(self, FRONT, BACK):
+    def compute_pars(self, FRONT, BACK):
+        rf, mf, lf = FRONT
+        rb, mb, lb = BACK
 
-    #     S = (self.pos[0], self.speed)
-    #     PA, PB, PC = FRONT
-    #     FA, FB, FC = BACK
+        can_left = lf-self.pos[0] > 0.7*self.gap * self.speed and\
+            self.pos[0]-lb > 0.5 * self.speed and\
+            self.pos[1] < (self.model.lanes - 1) and\
+            self.switched == 0
 
-    #     # Gaps before change
-    #     G_PB = PB[0] - S[0]
-    #     G_FB = S[0] - FB[0]
+        can_right = rf-self.pos[0] > 0.7*self.gap * self.speed and\
+            self.pos[0]-rb > 0.2 * self.speed and\
+            self.pos[1] > 0 and\
+            self.switched == 0
 
-    #     # Gaps to the right
-    #     G_PA = PA[0] - S[0]
-    #     G_FA = S[0] - FA[0]
+        can_middle = mf - self.pos[0] > self.gap*self.speed
 
-    #     # Gaps to the left
-    #     G_PC = PC[0] - S[0]
-    #     G_FC = S[0] - FC[0]
-
-    #     GAPS = [G_PA, G_PB, G_PC, G_FA, G_FB, G_FC]
-
-    #     # Collision times before change
-    #     T_PB = G_PB/(S[1]-PB[1])
-    #     T_FB = G_FB/(FB[1]-S[1])
-
-    #     # Collision times to the right
-    #     T_PA = G_PA/(S[1]-PA[1])
-    #     T_FA = G_FA/(FA[1]-S[1])
-
-    #     # Collision times to the left
-    #     T_PC = G_PC/(S[1]-PC[1])
-    #     T_FC = G_FC/(FC[1]-S[1])
-
-    #     TIMES = [T_PA, T_PB, T_PC, T_FA, T_FB, T_FC]
-
-    #     # Distances
-    #     # D_A = PA[0] - FA[0]
-    #     # D_C = PC[0] - FC[0]
-
-    #     # DISTS = [D_A, D_C]
-
-    #     G_PA_min = np.exp(1 + 1.541 * max(0, S[1]-PA[1]) +
-    #                       6.210*min(0, S[1]-PA[1])+0.13*PA[1]-0.008*self.v[0]+self.e[0])
-
-    #     G_FA_min = np.exp(1.5 + 1.426 * max(0, FA[1]-S[1])+0.64*FA[1]
-    #                       - 0.205 * self.v[1]+self.e[1])
-
-    #     G_PC_min = np.exp(1 + 1.541 * max(0, S[1]-PC[1]) +
-    #                       6.210*min(0, S[1]-PC[1])+0.13*PC[1]-0.008*self.v[0]+self.e[0])
-
-    #     G_FC_min = np.exp(1.5 + 1.426 * max(0, FC[1]-S[1])+0.64*FC[1]
-    #                       - 0.205 * self.v[1]+self.e[1])
-
-    #     min_gaps_r = (G_PA_min, G_FA_min)
-    #     min_gaps_l = (G_PC_min, G_FC_min)
-
-    #     return GAPS, TIMES, min_gaps_r, min_gaps_l
+        return can_left, can_middle, can_right
 
     def get_move(self):
         '''
@@ -88,62 +49,36 @@ class Car(Agent):
         self.switched -= 1
         self.switched = max(0, self.switched)
         FRONT, BACK = self.model.grid.get_neighbors(self)
+        rf, mf, lf = FRONT
+        rb, mb, lb = BACK
+        # self.match_speed(mf)
         # print(FRONT, BACK)
         # print(self.pos, self.speed)
         # print('-------')
         while True:
-            # gaps, times, min_r, min_l = self.compute_pars(FRONT, BACK)
-            rf, mf, lf = FRONT
-            rb, mb, lb = BACK
-            can_left = lf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-lb[0]> 0.5*self.speed and self.pos[1] < (self.model.lanes - 1) and self.switched == 0
-            can_right = rf[0]-self.pos[0] > self.gap*self.speed and self.pos[0]-rb[0]> 0.5*self.speed and self.pos[1] > 0 and self.switched == 0
-            if mf[0]-self.pos[0] > self.gap*self.speed:
-                if can_right and np.random.rand() < self.agression:
+            cl, cm, cr = self.compute_pars(FRONT, BACK)
+            if cm:
+                if cr:
                     self.switched = self.switch_delay
                     return -1
                 if self.speed < self.max_speed:
-                    self.check_speed(mf[0]-self.pos[0])
+                    self.check_speed(FRONT[1]-self.pos[0])
                 return 0
-            if can_left and can_right:
-                if rf[0] < lf[0]:
+            if cl and cr:
+                if rf < lf:
                     self.switched = self.switch_delay
                     return 1
-                if self.speed < 10:
+                if self.speed < self.max_speed:
                     self.switched = self.switch_delay
                     return -1
                 return 1
-            if can_left:
+            if cl and (np.random.rand() < self.agression):
                 self.switched = self.switch_delay
                 return 1
-            if can_right and (np.random.rand() > self.agression or self.speed < 10):
+            if cr:
                 self.switched = self.switch_delay
                 return -1
-            self.speed -= np.random.rand()*self.gap*self.model.time_step/self.agression
-            # print('-----')
-            # print(self.pos[1])
-            # print('middle')
-            # print(mf[0]-self.pos[0], self.pos[0]-mb[0], self.speed)
-            # print('right')
-            # print(rf[0]-self.pos[0], self.pos[0]-rb[0], self.speed)
-            # print('left')
-            # print(lf[0]-self.pos[0], self.pos[0]-lb[0], self.speed)
-            # print('slowed')
-        # front_view = int(self.speed*self.distance+view)
-        # back_view = -1*abs(int(5*self.speed/self.max_speed)*lane)
-        # if front_view == 0:
-        #     return (self.x+1, self.y+lane) in self.model.grid.empties
-        # if not self.model.lanes > (self.y + lane) >= 0:
-        #     return False
-        # for x in range(front_view, back_view, -1):
-        #     if (self.x+x, self.y+lane) in self.model.occupied:
-        #         return False
-        # return True
-
-    def is_slowed(self):
-        """
-        Check if the agent is below their maximum speed
-        """
-        return self.speed < self.max_speed
+            self.speed -= np.random.rand()*self.model.time_step
 
     def check_speed(self, gap):
         """
@@ -151,7 +86,7 @@ class Car(Agent):
         """
         diff = self.max_speed - self.speed
         space = (gap-self.speed)/self.speed/self.gap/self.agression
-        speedup = max(np.random.rand()/self.agression, np.log(diff*space))*self.model.time_step
+        speedup = max(abs(np.random.randn()), np.log(diff*space))*self.model.time_step
         self.speed += speedup
 
     def step(self):
@@ -217,7 +152,7 @@ class Car(Agent):
         move = self.get_move()
         self.model.move(self, move)
         if self.speed > self.max_speed:
-            self.speed -= np.random.rand()*self.gap*self.model.time_step*self.agression
+            self.speed -= np.random.rand()*self.model.time_step
 
         # if self.is_slowed():
         #     self.check_speed()

@@ -31,10 +31,10 @@ class RoadSim(Model):
         self.length = int(length)
         self.init_time = init_time
         self.time_step = time_step
-        self.agression = 1 - agression
+        self.agression = agression
         self.min_gap = min_gap
 
-        self.grid = LaneSpace(self.length, self.lanes, self.time_step)
+        self.grid = LaneSpace(self.length, self.lanes, self.time_step, scale=0.2)
 
         self.schedule = RandomActivation(self)
         self.speed = speed/3.6
@@ -104,15 +104,6 @@ class RoadSim(Model):
         self.schedule.step()
         self.init_cars()
         self.datacollector.collect(self)
-
-    def get_positions(self):
-        print('saving')
-        for agent in self.cars:
-            self.datacollector.add_table_row('Positions',
-                                             {'x': agent.pos[0],
-                                              'y': agent.pos[1]})
-        print('done')
-
     # def stats(self):
     #     """
     #     retrieve the speed of each car to determine distribution
