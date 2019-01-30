@@ -1,6 +1,6 @@
 from SALib.sample import saltelli
 from SALib.analyze import sobol
-from mesa.batchrunner import BatchRunner
+from mesa.batchrunner import BatchRunnerMP
 from modelgrid import *
 from IPython.display import clear_output
 from tqdm import tqdm
@@ -39,10 +39,11 @@ model_reporters={
                 }
 
 # READ NOTE BELOW CODE
-batch = BatchRunner(RoadSim,
-                    max_steps=max_steps,
-                    variable_parameters={name:[] for name in problem['names']},
-                    model_reporters=model_reporters)
+batch = BatchRunnerMP(RoadSim,
+                      nr_processes=8,
+                      max_steps=max_steps,
+                      variable_parameters={name:[] for name in problem['names']},
+                      model_reporters=model_reporters)
 
 count = 0
 for i in tqdm(range(replicates)):
