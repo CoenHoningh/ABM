@@ -20,7 +20,7 @@ problem = {
 }
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-replicates = 10 #10
+replicates = 2 #10
 max_steps = 100
 distinct_samples = 10
 
@@ -29,8 +29,12 @@ param_values = saltelli.sample(problem, distinct_samples)
 
 # Set the outputs
 model_reporters={
-                "Avg_speed": avg_speed,
-                'Cars_in_lane': cars_in_lane}
+                "Final_avg_speed": avg_speed,
+                'Final_Cars_in_lane': cars_in_lane,
+                "Data Collector": lambda m: m.datacollector,
+                'Total_Avg_speed': avg_speed,
+                'Total_Cars_in_lane': cars_in_lane
+                }
 
 # READ NOTE BELOW CODE
 batch = BatchRunner(RoadSim,
@@ -60,14 +64,23 @@ for i in tqdm(range(replicates)):
 data = batch.get_model_vars_dataframe()
 print(data.shape)
 
+for i in range(len(data["Data Collector"])):
+    if isinstance(data["Data Collector"][i], DataCollector):
+        data_speed = data["Data Collector"][i].get_model_vars_dataframe()['Avg_speed']
+        data_cars = data["Data Collector"][i].get_model_vars_dataframe()['Cars_in_lane']
+        # print(data_speed)
+        # print(np.average(data_speed))
+        data['Total_Avg_speed'][i] = np.average(data_speed)
+        data['Total_Cars_in_lane'][i] = np.average(data_cars)
+
 
 data.to_csv('Sobol_result.csv', sep=',', index=False)
 
 print(data)
 
-Si_Speed = sobol.analyze(problem, data['Avg_speed'].as_matrix(), print_to_console=False)
+Si_Speed = sobol.analyze(problem, data['Total_Avg_speed'].as_matrix(), print_to_console=False)
 print("\n")
-Si_Cars = sobol.analyze(problem, data['Cars_in_lane'].as_matrix(), print_to_console=False)
+Si_Cars = sobol.analyze(problem, data['Total_Cars_in_lane'].as_matrix(), print_to_console=False)
 
 
 def plot_index(s, params, i, title=''):
