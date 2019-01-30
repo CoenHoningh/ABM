@@ -19,19 +19,19 @@ class Car(Agent):
         self.speed = self.max_speed
         self.agression = agression
         self.gap = np.random.rand() / agression + min_gap
-        self.switch_delay = int(30 / agression / self.model.time_step)
+        self.switch_delay = int(5 / agression / self.model.time_step)
         self.switched = self.switch_delay
 
     def compute_pars(self, FRONT, BACK):
         rf, mf, lf = FRONT
         rb, mb, lb = BACK
 
-        can_left = lf-self.pos[0] > self.gap * self.speed and\
+        can_left = lf-self.pos[0] > 0.7*self.gap * self.speed and\
             self.pos[0]-lb > 0.5 * self.speed and\
             self.pos[1] < (self.model.lanes - 1) and\
             self.switched == 0
 
-        can_right = rf-self.pos[0] > self.gap * self.speed and\
+        can_right = rf-self.pos[0] > 0.7*self.gap * self.speed and\
             self.pos[0]-rb > 0.2 * self.speed and\
             self.pos[1] > 0 and\
             self.switched == 0

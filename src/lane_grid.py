@@ -121,21 +121,15 @@ class LaneSpace:
             backs: A (3,2) list which has the postition and speed of the
                 cars behind.
         """
-        fronts = [agent.model.length*2 for x in range(3)]
-        backs = [-100 for x in range(3)]
+        fronts = [agent.model.length*2, agent.model.length*2, agent.model.length*2]
+        backs = [-100, -100, -100]
         for i in range(0, 3):
             j = agent.pos[1]-1+i
             if 0 <= j < self.lanes:
-                f_ind = np.nonzero(agent.pos[0] < self.positions[j])
-                b_ind = np.nonzero(agent.pos[0] > self.positions[j])
-                if np.shape(f_ind)[1]:
-                    f_pos = self.positions[j][f_ind]
-                    # f_speed = self.speeds[j][f_ind]
-                    f = np.argmin(f_pos)
-                    fronts[i] = f_pos[f]
-                if np.shape(b_ind)[1]:
-                    b_pos = self.positions[j][b_ind]
-                    # b_speed = self.speeds[j][b_ind]
-                    b = np.argmax(b_pos)
-                    backs[i] = b_pos[b]
+                f_ind = self.positions[j][(agent.pos[0] < self.positions[j]).nonzero()]
+                b_ind = self.positions[j][(agent.pos[0] > self.positions[j]).nonzero()]
+                if len(f_ind):
+                    fronts[i] = np.minimum.reduce(f_ind)
+                if len(b_ind):
+                    backs[i] = np.maximum.reduce(b_ind)
         return fronts, backs
