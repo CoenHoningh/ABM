@@ -31,7 +31,7 @@ class RoadSim(Model):
         self.length = int(length)
         self.init_time = init_time
         self.time_step = time_step
-        self.agression = 1 - agression
+        self.agression = agression
         self.min_gap = min_gap
 
         self.grid = LaneSpace(self.length, self.lanes, self.time_step, scale=0.2)
