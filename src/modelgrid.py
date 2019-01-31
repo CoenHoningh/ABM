@@ -9,7 +9,7 @@ from mesa.datacollection import DataCollector
 # from mesa.space import SingleGrid
 import cargrid as car
 from lane_grid import LaneSpace
-from data_collection import avg_speed, cars_in_lane, track_params, track_run
+from data_collection import avg_speed, cars_in_lane, track_params, track_run, avg_slowdown
 
 
 class RoadSim(Model):
@@ -22,9 +22,9 @@ class RoadSim(Model):
     # pylint: disable=too-many-arguments
 
     def __init__(self, lanes=3, length=5000, spawn=0.4, agression=0.1,
-                 speed=100, time_step=0.1, init_time=0, min_gap=1.0):
+                 speed=100, time_step=0.1, init_time=0, min_gap=1.6):
         super().__init__()
-        self.uid = hash((spawn, agression, min_gap))
+        self.uid = hash((spawn, agression, lanes))
         self.current_id = 0
         self.lanes = lanes
         self.spawn_chance = spawn
@@ -46,6 +46,7 @@ class RoadSim(Model):
             model_reporters={
                 "Avg_speed": avg_speed,
                 'Cars_in_lane': cars_in_lane,
+                'Avg_slowdown': avg_slowdown,
                 'Model Params': track_params,
                 'Run': track_run}
             )

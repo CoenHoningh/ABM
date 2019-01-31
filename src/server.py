@@ -18,7 +18,7 @@ def agent_portrayal(agent):
     return portrayal
 
 
-number_of_lanes = 3
+number_of_lanes = 5
 length = 5000
 
 
