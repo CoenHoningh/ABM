@@ -34,7 +34,7 @@ class RoadSim(Model):
         self.agression = agression
         self.min_gap = min_gap
 
-        self.grid = LaneSpace(self.length, self.lanes, self.time_step, scale=0.2)
+        self.grid = LaneSpace(self.length, self.lanes, self.time_step, scale=0.5)
 
         self.schedule = RandomActivation(self)
         self.speed = speed/3.6

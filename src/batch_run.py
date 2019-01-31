@@ -19,7 +19,7 @@ br = BatchRunnerMP(RoadSim,
                    variable_parameters=br_params,
                    fixed_parameters=fixed_params,
                    iterations=1,
-                   max_steps=10000,
+                   max_steps=5000,
                    model_reporters={"Data Collector":
                                     lambda m: m.datacollector})
 
