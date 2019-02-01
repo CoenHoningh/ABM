@@ -1,8 +1,13 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib as mpl
+mpl.rcParams['figure.dpi']= 150
+sns.set()
 
-bla = pd.read_csv('snelheden.csv')
+
+bla = pd.read_csv('./snelheden_1.csv')
 x1 = np.array(bla['Avg_speed'])
 x2 = np.array(bla['Cars_in_lane'])
 y = np.arange(len(x1))/3600
