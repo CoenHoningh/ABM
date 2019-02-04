@@ -16,8 +16,7 @@ rcParams.update({'figure.autolayout': True})
 problem = {
     'num_vars': 3,
     'names': ['spawn', 'agression', 'min_gap'],
-    'bounds': [[0.3, 1], [0.1, 0.9], [0.5, 5]]
-}
+    'bounds': [[0.1, 0.9], [0.1, 0.9], [0.5, 2.0]]}
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 replicates = 10
