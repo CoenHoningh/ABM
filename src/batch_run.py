@@ -2,14 +2,15 @@ from mesa.batchrunner import BatchRunnerMP
 from mesa.datacollection import DataCollector
 import pandas as pd
 from modelgrid import RoadSim
+import numpy as np
 
 
-br_params = {"lanes": [3, 4, 5],
-             "agression": [0.1, 0.3, 0.5, 0.7, 0.9],
-             "spawn": [0.1, 0.3, 0.5, 0.7, 0.9]}
+br_params = {"lanes": [3, 4],
+             "spawn": [x for x in np.linspace(0.2, 0.5, 20)]}
 
 fixed_params = {"length": 5000,
                 "speed": 100,
+                "agression": 0.7,
                 "min_gap": 1.6,
                 "time_step": 0.1,
                 "init_time": 0}

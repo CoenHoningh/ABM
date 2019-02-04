@@ -27,12 +27,12 @@ class Car(Agent):
         rb, mb, lb = BACK
 
         can_left = lf-self.pos[0] > 0.7*self.gap * self.speed and\
-            self.pos[0]-lb > 0.5 * self.speed and\
+            self.pos[0]-lb > 0.5*self.gap * self.speed and\
             self.pos[1] < (self.model.lanes - 1) and\
             self.switched == 0
 
         can_right = rf-self.pos[0] > 0.7*self.gap * self.speed and\
-            self.pos[0]-rb > 0.2 * self.speed and\
+            self.pos[0]-rb > 0.2*self.gap * self.speed and\
             self.pos[1] > 0 and\
             self.switched == 0
 

@@ -83,7 +83,9 @@ class RoadSim(Model):
         new_car = car.Car(self.next_id(), self, start_lane, self.speed,
                           self.agression, self.min_gap)
 
-        self.grid.place_agent(new_car)
+        while not self.grid.place_agent(new_car):
+            new_car = car.Car(self.next_id(), self, start_lane, self.speed,
+                              self.agression, self.min_gap)
         self.cars.append(new_car)
         self.schedule.add(new_car)
 

@@ -39,6 +39,8 @@ class LaneSpace:
                 the system length. Can be used to increase the capacity
                 of decrease memory usage.
         """
+        self._init_len = length
+        self._scale = scale
         self.length = int(length*scale)
         self.lanes = lanes
         self.time_step = time_step
@@ -59,11 +61,22 @@ class LaneSpace:
             self.positions[lane, agent.index] = loc
             # self.speeds[lane, agent.index] = agent.speed
             agent.pos = (loc, lane)
-            return
-        print('agent index not empty')
-        print('Consider increasing the scale of the model')
-        print(len(agent.model.cars))
-        raise IndexError
+            return True
+        if len(agent.model.cars) > self.length:
+            print('agent index not empty')
+            print('rescaling array')
+            self._resize_grid()
+        else:
+            print('index not empty but space available')
+        return False
+
+    def _resize_grid(self):
+        self._scale = self._scale * 2
+        new_len = int(self._init_len*self._scale)
+        new_pos = np.full((self.lanes, new_len), np.nan)
+        new_pos[:, :self.length] = self.positions
+        self.positions = new_pos.copy()
+        self.length = new_len
 
     def move_agent(self, agent, lane_switch):
         """
