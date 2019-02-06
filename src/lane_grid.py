@@ -15,7 +15,7 @@ class LaneSpace:
     it allows for extremely quick operation as no lists or dictionaries have
     to be maintained.
 
-    Properties:
+    Attributes:
         positions: A (n, l) numpy array which contains the horizontal position
             of each agent. These positions are indexed by the current lane and
             unique id of the agent, where n is simply the lane number and
@@ -24,8 +24,6 @@ class LaneSpace:
             used to increase the capacity of each lane. The position index
             of each agent should then computed modulo the length of the scaled
             system.
-        speeds: A (n, l) numpy array which contains the speeds of each agent,
-            indexed following the same rules as the positions array.
     """
 
     def __init__(self, length, lanes, time_step=1, scale=1):
@@ -45,7 +43,6 @@ class LaneSpace:
         self.lanes = lanes
         self.time_step = time_step
         self.positions = np.full((self.lanes, self.length), np.nan)
-        # self.speeds = np.full((self.lanes, self.length), np.nan)
 
     def place_agent(self, agent):
         """
@@ -59,7 +56,6 @@ class LaneSpace:
         loc, lane = agent.pos
         if np.isnan(self.positions[lane, agent.index]):
             self.positions[lane, agent.index] = loc
-            # self.speeds[lane, agent.index] = agent.speed
             agent.pos = (loc, lane)
             return True
         if len(agent.model.cars) > self.length:
@@ -100,9 +96,7 @@ class LaneSpace:
         new_lane = lane + lane_switch
         if lane_switch:
             self.positions[lane, agent.index] = np.nan
-            # self.speeds[lane, agent.index] = np.nan
         self.positions[new_lane, agent.index] = new_loc
-        # self.speeds[new_lane, agent.index] = agent.speed
         agent.pos = (new_loc, new_lane)
         return True
 
@@ -115,7 +109,6 @@ class LaneSpace:
         """
         lane = agent.pos[1]
         self.positions[lane, agent.index] = np.nan
-        # self.speeds[lane, agent.index] = np.nan
 
     def get_neighbors(self, agent):
         """

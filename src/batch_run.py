@@ -1,3 +1,8 @@
+"""
+Module for perfoming a batch run.
+The range parameters can be set in the br_params dictionary.
+The fixed parameters are set in the fixed_params dictionary.
+"""
 from mesa.batchrunner import BatchRunnerMP
 from mesa.datacollection import DataCollector
 import pandas as pd

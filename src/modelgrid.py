@@ -1,7 +1,6 @@
 """ Module for the model instance.
 Creates the general road model in which the car agents reside.
 """
-import hashlib
 import numpy as np
 from mesa import Model
 from mesa.time import RandomActivation
@@ -9,32 +8,55 @@ from mesa.datacollection import DataCollector
 # from mesa.space import SingleGrid
 import cargrid as car
 from lane_grid import LaneSpace
-from data_collection import avg_speed, cars_in_lane, track_params, track_run, avg_slowdown
+from data_collection import avg_speed, cars_in_lane, track_params
+from data_collection import track_run, avg_slowdown
 
 
 class RoadSim(Model):
 
-    """ Hosts the road model and the mesa grid.
-    Contains methods to generate new car agents and collect data.
     """
+    Hosts the road model and the mesa grid.
+    Contains methods to generate new car agents and collect data.
 
+    Attributes:
+        uid (int): Hash of specific model parameters, used to
+            conveniently group duplicate runs for data analysis.
+        current_id (int): Initial value of the agent id generator,
+            advances by 1 each time an id is generated through the
+            next_id() method from the mesa scheduler.
+        length (int): Length in meters of the highway lanes.
+            Floored to an integer if a float is provided.
+        lanes (int): Number of lanes in the highway model
+        spawn_chance (float): Probability to generate a car each
+            second, scales with the relative time_step to maintain
+            a consistent spawn rate.
+        time_step (float): How many seconds each iteration advances,
+            e.g. 0.1 -> 10 steps for a second in 'real time'.
+        agression (float): Agression of the car agents.
+        min_gap (float): Minimal gap the car agents maintain.
+        grid (obj): Instance of the LaneSpace class, contains
+            the grid with all cars' locations.
+        schedule (obj): Instance of the mesa scheduler.
+        speed (float): Speed of the cars in m/s
+        cars (list): List of all car agent objects.
+    """
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
 
     def __init__(self, lanes=3, length=5000, spawn=0.4, agression=0.1,
-                 speed=100, time_step=0.1, init_time=0, min_gap=1.6):
+                 speed=100, time_step=0.1, min_gap=1.6):
         super().__init__()
         self.uid = hash((spawn, agression, lanes))
         self.current_id = 0
+        self.length = int(length)
         self.lanes = lanes
         self.spawn_chance = spawn
-        self.length = int(length)
-        self.init_time = init_time
         self.time_step = time_step
         self.agression = agression
         self.min_gap = min_gap
 
-        self.grid = LaneSpace(self.length, self.lanes, self.time_step, scale=0.5)
+        self.grid = LaneSpace(self.length, self.lanes, self.time_step,
+                              scale=0.5)
 
         self.schedule = RandomActivation(self)
         self.speed = speed/3.6
@@ -50,14 +72,6 @@ class RoadSim(Model):
                 'Model Params': track_params,
                 'Run': track_run}
             )
-
-        if init_time:
-            self.__init_sim()
-
-    def __init_sim(self):
-        for _ in range(self.init_time):
-            self.schedule.step()
-            self.init_cars()
 
     def get_free_lanes(self):
         """
@@ -97,7 +111,6 @@ class RoadSim(Model):
         """
         has_moved = self.grid.move_agent(agent, new_lane)
         if not has_moved:
-            # print(agent.unique_id)
             self.grid.remove_agent(agent)
             self.schedule.remove(agent)
             self.cars.remove(agent)
@@ -107,19 +120,3 @@ class RoadSim(Model):
         self.schedule.step()
         self.init_cars()
         self.datacollector.collect(self)
-    # def stats(self):
-    #     """
-    #     retrieve the speed of each car to determine distribution
-    #     """
-    #     speed_dist = [i.speed for i in self.cars]
-    #     avg_car_speed = np.average(speed_dist)
-    #     print(avg_car_speed)
-
-    # def run_sim(self, steps=500):
-    #     # self.visualise()
-    #     for _ in range(steps):
-    #         # plt.draw()
-    #         self.step()
-    #         print("hoi")
-    #         self.init_cars()
-    #         # plt.pause(0.001)
