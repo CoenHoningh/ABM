@@ -86,7 +86,7 @@ class Car(Agent):
         """
         diff = self.max_speed - self.speed
         space = (gap-self.speed)/self.speed/self.gap/self.agression
-        speedup = max(abs(np.random.randn()), np.log(diff*space))*self.model.time_step
+        speedup = max(np.random.rand(), np.log(diff*space))*self.model.time_step
         self.speed += speedup
 
     def step(self):

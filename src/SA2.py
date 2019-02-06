@@ -3,6 +3,7 @@ from SALib.analyze import sobol
 from mesa.batchrunner import BatchRunnerMP
 from modelgrid import *
 from IPython.display import clear_output
+import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from itertools import combinations
@@ -19,70 +20,7 @@ problem = {
     'bounds': [[0.3, 0.8], [0.2, 0.8], [0.5, 2.0]]
 }
 
-# Set the repetitions, the amount of steps, and the amount of distinct values per variable
-replicates = 5
-max_steps = 5000
-distinct_samples = 5
-
-# We get all our samples here
-param_values = saltelli.sample(problem, distinct_samples)
-
-# Set the outputs
-model_reporters={
-                "Final_avg_speed": avg_speed,
-                'Final_Cars_in_lane': cars_in_lane,
-                "Data Collector": lambda m: m.datacollector,
-                'Total_Avg_speed': avg_speed,
-                'Total_Cars_in_lane': cars_in_lane,
-                'Variance_speed': avg_speed,
-                'Variance_car': cars_in_lane
-                }
-
-# READ NOTE BELOW CODE
-batch = BatchRunnerMP(RoadSim,
-                      nr_processes=8,
-                      max_steps=max_steps,
-                      variable_parameters={name:[] for name in problem['names']},
-                      model_reporters=model_reporters)
-
-count = 0
-for i in tqdm(range(replicates)):
-    for vals in tqdm(param_values):
-        # Change parameters that should be integers
-        vals = list(vals)
-        # vals[0] = int(vals[0])
-        # vals[3] = int(vals[3])
-
-        # Transform to dict with parameter names and their values
-        variable_parameters = {}
-        for name, val in zip(problem['names'], vals):
-            variable_parameters[name] = val
-
-        batch.run_iteration(variable_parameters, tuple(vals), count)
-        count += 1
-
-        # clear_output()
-        # print(f'{count / (len(param_values) * (replicates)) * 100:.2f}% done')
-
-data_original = batch.get_model_vars_dataframe()
-data = data_original.copy()
-print(data.shape)
-
-for i in tqdm(range(len(data["Data Collector"]))):
-    if isinstance(data["Data Collector"][i], DataCollector):
-        data_speed = data["Data Collector"][i].get_model_vars_dataframe()['Avg_speed']
-        data_cars = data["Data Collector"][i].get_model_vars_dataframe()['Cars_in_lane']
-        # print(data_speed)
-        # print(np.average(data_speed))
-        tenproc = int(0.2 * (len(data_speed)))
-        # print(tenproc)
-        data['Total_Avg_speed'][i] = np.average(data_speed[tenproc:])
-        data['Total_Cars_in_lane'][i] = np.average(data_cars[tenproc:])
-        data['Variance_speed'][i] = np.var(data_speed[tenproc:])
-        data['Variance_car'][i] = np.var(data_cars[tenproc:])
-
-
-data.to_csv('Sobol_result.csv', sep=',', index=False)
+data = pd.read_csv('./Sobol_result.csv')
 
 print(data)
 
