@@ -1,7 +1,7 @@
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
-from lane_canvas import SimpleCanvas
+from lane_canvas import LaneCanvas
 
 # Import the implemented classes
 from modelgrid import RoadSim
@@ -14,7 +14,7 @@ def agent_portrayal(agent):
     portrayal = {"Shape": "circle",
                  "Color": f"rgb({140-(agent.speed*3.6)},{50+(agent.speed*3.6)},0)",
                  "Filled": "true",
-                 "r": 6}
+                 "r": 4}
     return portrayal
 
 
@@ -22,7 +22,7 @@ number_of_lanes = 4
 length = 5000
 
 
-grid = SimpleCanvas(agent_portrayal, length, number_of_lanes*30)
+grid = LaneCanvas(agent_portrayal, length, number_of_lanes*30)
 
 
 # Create a dynamic linegraph
@@ -33,7 +33,7 @@ chart = ChartModule([{"Label": "Avg_speed",
 
 # Create the server, and pass the grid and the graph
 server = ModularServer(RoadSim,
-                       [grid],
+                       [grid, chart],
                        "Road sim yo",
                        {"lanes": number_of_lanes,
                         "length": length,
@@ -44,7 +44,7 @@ server = ModularServer(RoadSim,
                         "agression":
                             UserSettableParameter('slider',
                                                   "Driver Agression",
-                                                  0.5, 0.1, 1.0, 0.05),
+                                                  0.5, 0.1, 0.99, 0.05),
                         "min_gap":
                             UserSettableParameter('slider',
                                                   "Smallest gap",

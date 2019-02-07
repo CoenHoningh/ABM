@@ -5,7 +5,6 @@ import numpy as np
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
-# from mesa.space import SingleGrid
 import cargrid as car
 from lane_grid import LaneSpace
 from data_collection import avg_speed, cars_in_lane, track_params
@@ -39,12 +38,25 @@ class RoadSim(Model):
         schedule (obj): Instance of the mesa scheduler.
         speed (float): Speed of the cars in m/s
         cars (list): List of all car agent objects.
+        datacollector (obj): Mesa datacollector object to
+            report data during a simulation.
     """
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
 
     def __init__(self, lanes=3, length=5000, spawn=0.4, agression=0.1,
                  speed=100, time_step=0.1, min_gap=1.6):
+        """
+        Args:
+            lanes (int): number of lanes
+            length (float): length of each lane in meters, floored to an
+                integer value
+            spawn (float): spawn probability of a car on each lane every step
+            agression (float): agression of the car agents
+            speed (float): general speed of the car agents in km/h
+            time_step (float): time in seconds to be advanced each step
+            min_gap (float): minimum gap cars maintain in meters
+        """
         super().__init__()
         self.uid = hash((spawn, agression, lanes))
         self.current_id = 0
@@ -61,9 +73,6 @@ class RoadSim(Model):
         self.schedule = RandomActivation(self)
         self.speed = speed/3.6
         self.cars = []
-        self.new_car()
-        self.new_car(start_lane=1)
-
         self.datacollector = DataCollector(
             model_reporters={
                 "Avg_speed": avg_speed,
@@ -72,12 +81,20 @@ class RoadSim(Model):
                 'Model Params': track_params,
                 'Run': track_run}
             )
+        # Initialize 2 cars
+        self.new_car()
+        self.new_car(start_lane=1)
 
     def get_free_lanes(self):
         """
-        Returns a bool arary of the availability of each lane.
+        Determines if each lane has enough space for a car to spawn: should
+        be at least the speed of the car.
+
+        Returns:
+            A boolean array with the value of each lane.
         """
-        return np.count_nonzero(self.grid.positions < self.speed*self.time_step, axis=1) == 0
+        return np.count_nonzero(self.grid.positions <
+                                self.speed*self.time_step, axis=1) == 0
 
     def init_cars(self):
         """
@@ -93,6 +110,8 @@ class RoadSim(Model):
     def new_car(self, start_lane=0):
         """
         Generates a new car object and adds it to the model scheduler.
+        If the index of the agent is already occupied in the lane grid
+        a new one is generated.
         """
         new_car = car.Car(self.next_id(), self, start_lane, self.speed,
                           self.agression, self.min_gap)
@@ -105,18 +124,21 @@ class RoadSim(Model):
 
     def move(self, agent, new_lane):
         """
-        Wrapper method on the mesa move agent method, also updates the
-        global occupied set which allows for very fast lookups compared to
-        the empties list. The agent pos variable is also updated.
+        Wrapper method over the grid move_agent method. Determines if
+        the move remained inbounds and removes the car from the model
+        otherwise.
         """
         has_moved = self.grid.move_agent(agent, new_lane)
         if not has_moved:
             self.grid.remove_agent(agent)
             self.schedule.remove(agent)
             self.cars.remove(agent)
-            return
 
     def step(self):
+        """
+        Step method for the mesa scheduler. Moves the car agents, initializes
+        new cars, and collects model data in order.
+        """
         self.schedule.step()
         self.init_cars()
         self.datacollector.collect(self)

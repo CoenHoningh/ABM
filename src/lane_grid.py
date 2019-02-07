@@ -10,13 +10,18 @@ class LaneSpace:
     the lanes on a highway. Whilst the other axis is continuous in natue,
     such as the distance traveled on the highway.
 
-    The postion and speed of each agent is stored in a numpy array, indexed
-    to the unique_id of the agent. Although this limits the number of agents
-    it allows for extremely quick operation as no lists or dictionaries have
-    to be maintained.
+    The postion of each agent is stored in a numpy array, indexed to the
+    unique_id of the agent modulo the size of the lane. Although this limits
+    the number of agents it allows for extremely quick operation as no lists
+    or dictionaries have to be maintained. If the number of agents exceeds
+    array capacity the array is dynamically expanded.
 
     Attributes:
-        positions: A (n, l) numpy array which contains the horizontal position
+        length (int): Scaled length of the array; the number of agents
+            each lane can contain.
+        lanes (int): Number of lanes
+        time_step (float): Amount of time to advance each step in seconds.
+        positions ((n, l) array): Contains the horizontal position
             of each agent. These positions are indexed by the current lane and
             unique id of the agent, where n is simply the lane number and
             l the unique_id of an agent modulo the length of the space.
@@ -26,14 +31,15 @@ class LaneSpace:
             system.
     """
 
-    def __init__(self, length, lanes, time_step=1, scale=1):
+    def __init__(self, length, lanes, time_step=1.0, scale=1.0):
         """
         Initialize the highway space.
 
         Args:
-            length: The length of the highway in meters
-            lanes: The number of lanes
-            scale: Value to scale the position array by, relative to
+            length (float): The length of the highway in meters
+            lanes (int): The number of lanes
+            time_step (float): Amount of time to advance each step in seconds.
+            scale (float): Value to scale the position array by, relative to
                 the system length. Can be used to increase the capacity
                 of decrease memory usage.
         """
@@ -46,12 +52,17 @@ class LaneSpace:
 
     def place_agent(self, agent):
         """
-        Place an agent on the highway space.
+        Place an agent on the highway space. Determines if the agent index
+        is already occupied and increases the scale of the grid if the
+        number of agents exceeds the capacity.
 
         Args:
-            agent: an agent instance which should have a speed and
+            agent (obj): an agent instance which should have a speed and
                 index property. Representing the agent speed and unique_id
                 modulo length respectively
+
+        Returns:
+            A boolean value if the placement was succesfull.
         """
         loc, lane = agent.pos
         if np.isnan(self.positions[lane, agent.index]):
@@ -67,6 +78,11 @@ class LaneSpace:
         return False
 
     def _resize_grid(self):
+        """
+        Private method to resize the grid if needed. A new array is created
+        with double the capacity, the current positions array is copied to
+        the first half of this array.
+        """
         self._scale = self._scale * 2
         new_len = int(self._init_len*self._scale)
         new_pos = np.full((self.lanes, new_len), np.nan)
@@ -79,15 +95,15 @@ class LaneSpace:
         Move an agent to a new postition on the highway space.
 
         Args:
-            agent: An agent instance which is expected to have the current
-                postition as a 2-tuple pos, the speed, and the postion index.
-            lane_switch: An integer which indicates the next lane of an agent.
-                -1 moves a lane to the right, 0 retains the current lane, and
-                1 moves a lane to the left.
+            agent (obj): An agent instance which is expected to have the
+                current postition as a 2-tuple named pos.
+            lane_switch (int): Indicates the next lane of an agent: -1 moves a
+                lane to the right, 0 retains the current lane, and 1 moves a
+                lane to the left.
 
         Returns:
-            False: if the agent has moved out of the defined space
-            True: if the move was succesfull.
+            A boolean value if the move was succesfull or not,
+            i.e. out of bounds
         """
         loc, lane = agent.pos
         if loc+agent.speed > agent.model.length:
@@ -105,7 +121,7 @@ class LaneSpace:
         Remove an agent from the highway space.
 
         Args:
-            agent: An agent instance to be removed from the space.
+            agent (obj): An agent instance to be removed from the space.
         """
         lane = agent.pos[1]
         self.positions[lane, agent.index] = np.nan
@@ -117,25 +133,37 @@ class LaneSpace:
         Used to compute the utility of the possible move of an agent.
 
         Args:
-            agent: An agent instance with a speed and pos property.
+            agent (obj): An agent instance with a pos property.
 
         Returns:
-            fronts: A (3,2) list which contains the position and speed of
-                the cars in front on the right, current, and left lane.
-                If no cars are in front, or the car is on one of the outer
-                most lanes, -1 is returned for both values.
-            backs: A (3,2) list which has the postition and speed of the
-                cars behind.
+            fronts ([3] list): Contains the positions of the cars in front on
+                right, middle and left respectively.
+            backs ([3] list): Contains the positions of the cars behind on the
+                right, middle and left respectively.
         """
-        fronts = [agent.model.length*2, agent.model.length*2, agent.model.length*2]
+        fronts = [agent.model.length*2,
+                  agent.model.length*2,
+                  agent.model.length*2]
         backs = [-100, -100, -100]
+
         for i in range(0, 3):
             j = agent.pos[1]-1+i
             if 0 <= j < self.lanes:
-                f_ind = self.positions[j][(agent.pos[0] < self.positions[j]).nonzero()]
-                b_ind = self.positions[j][(agent.pos[0] > self.positions[j]).nonzero()]
+                # All cars in front of the current car
+                f_ind = self.positions[j][(agent.pos[0] <
+                                           self.positions[j]).nonzero()]
+                # All cars behind the current car
+                b_ind = self.positions[j][(agent.pos[0] >
+                                           self.positions[j]).nonzero()]
+
+                """
+                Directly using the min/max ufuncs is considerably faster
+                than the amin/amax numpy functions.
+                """
                 if len(f_ind):
+                    # The closest car in front
                     fronts[i] = np.minimum.reduce(f_ind)
                 if len(b_ind):
+                    # The closest car behind
                     backs[i] = np.maximum.reduce(b_ind)
         return fronts, backs

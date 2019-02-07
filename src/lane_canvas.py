@@ -1,8 +1,8 @@
 from mesa.visualization.ModularVisualization import VisualizationElement
 
 
-class SimpleCanvas(VisualizationElement):
-    local_includes = ["yoyo.js"]
+class LaneCanvas(VisualizationElement):
+    local_includes = ["lanes.js"]
     portrayal_method = None
     canvas_height = 300
     canvas_width = 5000
@@ -31,4 +31,3 @@ class SimpleCanvas(VisualizationElement):
             portrayal["y"] = y
             space_state.append(portrayal)
         return space_state
-
