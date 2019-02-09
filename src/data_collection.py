@@ -19,7 +19,7 @@ def avg_slowdown(model):
     return np.average(speeds)*3.6
 
 def cars_in_lane(model):
-    return len(model.schedule.agents)
+    return len(model.schedule.agents)//model.lanes
 
 def track_params(model):
     return (model.spawn_chance, model.agression, model.lanes)

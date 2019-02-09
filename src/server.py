@@ -27,14 +27,16 @@ grid = LaneCanvas(agent_portrayal, length, number_of_lanes*30)
 
 # Create a dynamic linegraph
 chart = ChartModule([{"Label": "Avg_speed",
-                      "Color": "green"}],
+                      "Color": "green"},
+                     {"Label": "Cars_in_lane",
+                      "Color": "red"}],
                     data_collector_name='datacollector')
 
 
 # Create the server, and pass the grid and the graph
 server = ModularServer(RoadSim,
                        [grid, chart],
-                       "Road sim yo",
+                       "Interactive road congestion simulator",
                        {"lanes": number_of_lanes,
                         "length": length,
                         "spawn":
