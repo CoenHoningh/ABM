@@ -22,6 +22,28 @@ varies over time.
 
 ## Interactive data analysis
 Along with the visual browser app is is also possible to perform individual runs through
-a jupyter notebook, included in the 'Data-analysis' directory. This notebook allows the
-user to specify parameters and perform a run for a selected number of timesteps.
-After the run is complete the results can be graphed through the plot() method.
+the `interactive_data_analysis` jupyter notebook, included in the `Data-analysis` directory.
+This notebook allows the user to specify parameters and perform a run for a selected number of timesteps.
+After the run is complete the results can be graphed through the `plot()` method.
+
+## Sensitivity analysis: OFAT
+Due to the length of sensitivity analysis runs a python script is provided instead of a notebook.
+The `batch_run.py` file allows the user to perform an OFAT like analysis by running through all posible
+combinations in the `br_params` dictionary. The results are put in a `csv` file whose name is also
+specified in the script. The created `csv` file can then be used for further data analysis in
+the `Interactive_OFAT_analysis` jupyter notebook, located in the `Data-analysis/OFAT` directory.
+In this notebook examples are provided of both 2D and 3D scatter plots which allow for quick
+visual analysis of the results.
+
+## Sensitivity analysis: Sobol
+Finally, Sobol analysis can be performed through the `SA.py` file in the `src` directory.
+As it is the most expensive analysis only a python script is provided. The variables are specified
+in the `problem` dictionary, along with the bounds of these variables. The script exports the figures
+in the `src/plots` directory, along with a `Sobol_result.csv` file to allow the user to create their
+own plots.
+
+
+# Modifiying the code
+In addition to the provided analysis tools, it is also possible for the user to create their own
+analysis or even change the model itself. All model source files in the `src` directory are thourougly
+comented, providing the user with information on each class and method.

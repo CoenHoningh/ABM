@@ -6,13 +6,24 @@ The fixed parameters are set in the fixed_params dictionary.
 from mesa.batchrunner import BatchRunnerMP
 from mesa.datacollection import DataCollector
 import pandas as pd
-from modelgrid import RoadSim
 import numpy as np
+from modelgrid import RoadSim
+
+"""
+Name of the output file, to be loaded in the OFAT jupyter notebook.
+"""
+csv_filename = 'batch_run_lanes.csv'
 
 
+"""
+The parameters to be vaired, with all posibilities in list form.
+"""
 br_params = {"lanes": [3, 4],
              "spawn": [x for x in np.linspace(0.2, 0.5, 20)]}
 
+"""
+The fixed parameters.
+"""
 fixed_params = {"length": 5000,
                 "speed": 100,
                 "agression": 0.7,
@@ -36,4 +47,4 @@ for i in range(len(br_df["Data Collector"])):
     if isinstance(br_df["Data Collector"][i], DataCollector):
         i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
         br_step_data = br_step_data.append(i_run_data, ignore_index=True)
-br_step_data.to_csv("batch_run_lanes.csv")
+br_step_data.to_csv(csv_filename)
