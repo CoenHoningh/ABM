@@ -29,12 +29,11 @@ br = BatchRunnerMP(RoadSim,
                    model_reporters={"Data Collector":
                                     lambda m: m.datacollector})
 
-if __name__ == '__main__':
-    br.run_all()
-    br_df = br.get_model_vars_dataframe()
-    br_step_data = pd.DataFrame()
-    for i in range(len(br_df["Data Collector"])):
-        if isinstance(br_df["Data Collector"][i], DataCollector):
-            i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
-            br_step_data = br_step_data.append(i_run_data, ignore_index=True)
-    br_step_data.to_csv("batch_run_lanes.csv")
+br.run_all()
+br_df = br.get_model_vars_dataframe()
+br_step_data = pd.DataFrame()
+for i in range(len(br_df["Data Collector"])):
+    if isinstance(br_df["Data Collector"][i], DataCollector):
+        i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
+        br_step_data = br_step_data.append(i_run_data, ignore_index=True)
+br_step_data.to_csv("batch_run_lanes.csv")

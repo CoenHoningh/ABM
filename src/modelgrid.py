@@ -9,6 +9,7 @@ import cargrid as car
 from lane_grid import LaneSpace
 from data_collection import avg_speed, cars_in_lane, track_params
 from data_collection import track_run, avg_slowdown
+np.warnings.filterwarnings('ignore')
 
 
 class RoadSim(Model):

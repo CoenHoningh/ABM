@@ -1,5 +1,6 @@
 """ Module for mixed systems with both a discrete and continuous axis """
 import numpy as np
+np.warnings.filterwarnings('ignore')
 
 
 class LaneSpace:
