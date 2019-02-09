@@ -2,3 +2,6 @@ mesa
 numpy
 tqdm
 matplotlib
+pandas
+SALib
+seaborn

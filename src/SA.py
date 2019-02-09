@@ -1,3 +1,9 @@
+"""
+Script to perform sobol analysis of the model.
+Modified from the example sobol analysis notebook on canvas.
+
+The variable parameters are specified in the problem dictionary.
+"""
 from SALib.sample import saltelli
 from SALib.analyze import sobol
 from mesa.batchrunner import BatchRunnerMP
@@ -12,6 +18,7 @@ from matplotlib import rcParams
 sns.set()
 rcParams.update({'figure.autolayout': True})
 
+# Variable parameters
 problem = {'num_vars': 3,
            'names': ['spawn', 'agression', 'min_gap'],
            'bounds': [[0.3, 0.8], [0.2, 0.8], [0.5, 2.0]]}
